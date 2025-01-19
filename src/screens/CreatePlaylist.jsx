@@ -1,5 +1,5 @@
 import React, {useState} from 'react';
-import {useSelector} from 'react-redux';
+import {useDispatch, useSelector} from 'react-redux';
 import {
   StyleSheet,
   Text,
@@ -11,6 +11,7 @@ import {
   useColorScheme,
 } from 'react-native';
 import {launchImageLibrary} from 'react-native-image-picker';
+import {createPlaylists} from '../redux/slices/playlist.slice';
 
 import TopColor from '../components/common/TopColor';
 import MiddleColor from '../components/common/MiddleColor';
@@ -21,7 +22,13 @@ import BackButton from '../components/common/BackButton';
 import {Icons} from '../utils/constants.utils';
 
 const CreatePlaylist = ({navigation}) => {
+  const dispatch = useDispatch();
   const isDarkMode = useColorScheme() === 'dark';
+  const [playlist, setPlaylist] = useState({
+    cover: '',
+    name: '',
+    songs: [],
+  });
   const [playlistImage, setPlaylistImage] = useState(null);
   const [playlistName, setPlaylistName] = useState('');
 
@@ -59,7 +66,28 @@ const CreatePlaylist = ({navigation}) => {
     );
   };
 
-  const handleSubmit = () => {};
+  const handleSubmit = () => {
+    if (!playlistName || !playlistImage) {
+      alert('Please provide a playlist name and cover image');
+      return;
+    }
+
+    if (selectedSongs.length === 0) {
+      alert('Please provide a playlist name and cover image');
+      return;
+    }
+
+    const newPlaylist = {
+      name: playlistName,
+      cover: playlistImage,
+      songs: selectedSongs,
+    };
+
+    dispatch(createPlaylists(newPlaylist));
+
+    navigation.goBack();
+  };
+
   return (
     <View
       style={[

@@ -21,6 +21,7 @@ import HeaderContainer from '../components/common/HeaderContainer';
 import HeadingContainer from '../components/common/HeadingContainer';
 import AccessAllower from '../components/AccessAllower';
 import NothingFound from '../components/common/NothingFound';
+import PaginationDots from '../components/PaginationDots';
 import Widget from '../components/common/Widget';
 
 import {temt_2} from '../utils/constants.utils';
@@ -29,8 +30,6 @@ import SoundPlayer from 'react-native-sound-player';
 import {setPlaying} from '../redux/slices/playing.slice';
 
 const Feed = ({navigation}) => {
-  const data = [1, 2, 3];
-
   const dispatch = useDispatch();
 
   const isDarkMode = useColorScheme() === 'dark';
@@ -59,21 +58,7 @@ const Feed = ({navigation}) => {
 
   useEffect(() => {
     // getSongs(dispatch);
-  }, [favorites]);
-
-  useEffect(() => {
-    // try {
-    //   SoundPlayer.playUrl(`file://${songs[11].songPath}`); // Prefix with "file://"
-    // } catch (error) {
-    //   console.log('Error playing sound:', error);
-    // }
-    // MusicControl.setNowPlaying({
-    //   title: songs[11].title,
-    //   artwork: `file://${songs[11].coverImage}`, // URL or RN's image require()
-    //   artist: songs[11].artist,
-    //   isLiveStream: true, // iOS Only (Boolean), Show or hide Live Indicator instead of seekbar on lock screen for live streams. Default value is false.
-    // });
-  }, [currentSong]);
+  }, [playlists]);
 
   return (
     <View
@@ -85,19 +70,17 @@ const Feed = ({navigation}) => {
         <HeaderContainer
           isMenu={true}
           menuCallback={() => handleDrawer(navigation)}
-          additionalStyles={{marginBottom: 25}}
+          additionalStyles={{marginBottom: 25, paddingHorizontal: 25}}
         />
 
         <View>
-          {/* playlists cards  */}
-
           {playlists && playlists.length > 0 ? (
             <FlatList
-              data={data}
-              renderItem={() => <PlayListCard />}
-              // contentContainerStyle={{
-              //   paddingBottom: 50,
-              // }}
+              data={playlists}
+              renderItem={playlist => <PlayListCard playlist={playlist.item} />}
+              contentContainerStyle={{
+                paddingBottom: 50,
+              }}
               pagingEnabled
               horizontal
               showsHorizontalScrollIndicator={false}
@@ -106,7 +89,15 @@ const Feed = ({navigation}) => {
               onViewableItemsChanged={onViewableItemsChanged}
             />
           ) : (
-            <PlayListCard additionalStyles={{marginLeft: -25}} />
+            <PlayListCard />
+          )}
+
+          {playlists && playlists.length > 0 && (
+            <View style={styles.dotsContainer}>
+              {playlists.map((_, i) => (
+                <PaginationDots isActive={i == activeIndex} />
+              ))}
+            </View>
           )}
         </View>
 
@@ -115,7 +106,11 @@ const Feed = ({navigation}) => {
         <HeadingContainer
           title={'Favorite'}
           isViewAll={true}
-          additionalStyles={{marginTop: 25, marginBottom: 10}}
+          additionalStyles={{
+            marginTop: 25,
+            marginBottom: 10,
+            paddingHorizontal: 25,
+          }}
         />
 
         <View style={styles.favouriteContainer}>
@@ -130,7 +125,11 @@ const Feed = ({navigation}) => {
             <HeadingContainer
               title={'All Songs'}
               isViewAll={true}
-              additionalStyles={{marginTop: 25, marginBottom: 10}}
+              additionalStyles={{
+                marginTop: 25,
+                marginBottom: 10,
+                paddingHorizontal: 25,
+              }}
             />
 
             <View style={styles.songContainer}>
@@ -183,7 +182,6 @@ const styles = StyleSheet.create({
     flex: 1,
     zIndex: 1,
     justifyContent: 'space-between',
-    paddingHorizontal: 25,
     paddingTop: 55,
   },
 
@@ -192,14 +190,17 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
+    paddingHorizontal: 25,
   },
 
   songContainer: {
     flex: 1,
     zIndex: 1,
+    paddingHorizontal: 25,
   },
 
   dotsContainer: {
+    marginTop: -30,
     zIndex: 1,
     flexDirection: 'row',
     justifyContent: 'center',

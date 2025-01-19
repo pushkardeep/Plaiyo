@@ -6,11 +6,11 @@ const playlistsSlice = createSlice({
     playlists: [],
   },
   reducers: {
-    setPlaylists: (state, action) => {
-      state.playlists = action.payload;
+    createPlaylists: (state, action) => {
+      state.playlists = [...state.playlists, action.payload];
     },
   },
 });
 
-export const {setPlaylists} = playlistsSlice.actions;
+export const {createPlaylists} = playlistsSlice.actions;
 export default playlistsSlice.reducer;

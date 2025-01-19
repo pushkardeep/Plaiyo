@@ -9,7 +9,7 @@ import {
 } from 'react-native';
 import {temt_1} from '../utils/constants.utils';
 
-const PlayListCard = ({playlist, isAvailable, additionalStyles}) => {
+const PlayListCard = ({playlist, additionalStyles}) => {
   const {width} = Dimensions.get('window');
 
   return (
@@ -25,30 +25,28 @@ const PlayListCard = ({playlist, isAvailable, additionalStyles}) => {
       <View style={{width: '90%', height: '100%'}}>
         <Image
           resizeMode="cover"
-          source={temt_1}
-          style={[
-            styles.playlistImg,
-            {zIndex: 1, opacity: isAvailable ? 1 : 0.4},
-          ]}
+          source={playlist?.cover ? {uri: `file://${playlist.cover}`} : temt_1}
+          style={[styles.playlistImg, {zIndex: 1, opacity: playlist ? 1 : 0.4}]}
         />
-        <Image
-          resizeMode="cover"
-          source={temt_1}
-          style={[
-            styles.playlistImgShadow,
-            {display: isAvailable ? '' : 'none'},
-          ]}
-        />
-        {isAvailable && (
+        {playlist && (
+          <Image
+            resizeMode="cover"
+            source={
+              playlist?.cover ? {uri: `file://${playlist.cover}`} : temt_1
+            }
+            style={[styles.playlistImgShadow]}
+          />
+        )}
+        {playlist && (
           <View style={styles.playlistInfoContainer}>
-            <Text style={styles.playlistTitle}>{playlist?.title}</Text>
+            <Text style={styles.playlistTitle}>{playlist?.name}</Text>
             <Text style={styles.playlistSongsCount}>
               {playlist?.songs?.length} Songs
             </Text>
           </View>
         )}
 
-        {!isAvailable && (
+        {!playlist && (
           <View style={styles.playlistCreateTextContainer}>
             <Text style={styles.playlistIndicatorText}>
               Don't have any playlist
