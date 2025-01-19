@@ -3,9 +3,9 @@ import {StyleSheet, TouchableOpacity, Image} from 'react-native';
 
 import {menu} from '../utils/constants.utils';
 
-const MenuButton = ({onClick}) => {
+const MenuButton = ({callback, additionalStyles}) => {
   return (
-    <TouchableOpacity onPress={onClick}>
+    <TouchableOpacity onPress={callback} style={{...additionalStyles}}>
       <Image
         resizeMode="contain"
         source={menu}

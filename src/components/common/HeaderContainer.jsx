@@ -8,7 +8,7 @@ const HeaderContainer = ({isMenu, menuCallback, isBack, additionalStyles}) => {
   const isDarkMode = useColorScheme() === 'dark';
   return (
     <View style={[styles.container, {...additionalStyles}]}>
-      {isMenu && <MenuButton onClick={menuCallback} />}
+      {isMenu && <MenuButton callback={menuCallback} />}
       {isBack && <BackButton />}
 
       <Text

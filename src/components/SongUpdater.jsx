@@ -7,6 +7,7 @@ import {
   stepForward,
 } from '../services/player/player.service';
 import {setCurrentSong} from '../redux/slices/player.slice';
+import {setPlaying} from '../redux/slices/playing.slice';
 
 const SongUpdater = () => {
   const dispatch = useDispatch();
@@ -14,7 +15,6 @@ const SongUpdater = () => {
   // song list
   const {songs} = useSelector(state => state.songs);
 
-  const {isPlaying} = useSelector(state => state.playing);
   const {isRepeat, isShuffle, currentSong} = useSelector(state => state.player);
   const {} = useSelector(state => state.player);
 
@@ -43,6 +43,10 @@ const SongUpdater = () => {
       subscription.remove();
     };
   }, [isRepeat, isShuffle, currentSong]);
+
+  useEffect(() => {
+    dispatch(setPlaying(false));
+  }, []);
 
   const playRandomSong = () => {
     const randomIndex = Math.floor(Math.random() * songs.length);

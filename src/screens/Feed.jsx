@@ -43,6 +43,10 @@ const Feed = ({navigation}) => {
   const {playlists} = useSelector(state => state.playlist);
   const {favorites} = useSelector(state => state.favorites);
 
+  const handleDrawer = navigation => {
+    navigation.openDrawer();
+  };
+
   const onViewableItemsChanged = ({viewableItems}) => {
     if (viewableItems.length > 0) {
       setActiveIndex(viewableItems[0].index);
@@ -78,7 +82,11 @@ const Feed = ({navigation}) => {
         {backgroundColor: isDarkMode ? '#1D1B29' : 'white'},
       ]}>
       <View style={styles.contentContainer}>
-        <HeaderContainer isMenu={true} additionalStyles={{marginBottom: 25}} />
+        <HeaderContainer
+          isMenu={true}
+          menuCallback={() => handleDrawer(navigation)}
+          additionalStyles={{marginBottom: 25}}
+        />
 
         <View>
           {/* playlists cards  */}

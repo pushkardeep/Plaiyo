@@ -3,10 +3,13 @@ import {StyleSheet, StatusBar, useColorScheme} from 'react-native';
 
 import {NavigationContainer} from '@react-navigation/native';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
+import {createDrawerNavigator} from '@react-navigation/drawer';
 
 import {store, persistor} from './src/redux/store';
 import {Provider} from 'react-redux';
 import {PersistGate} from 'redux-persist/integration/react';
+
+import {GestureHandlerRootView} from 'react-native-gesture-handler';
 
 // screens
 import Home from './src/screens/Home';
@@ -20,8 +23,25 @@ import Playlist from './src/screens/Playlist';
 // component
 import BgSongNotifee from './src/components/BgSongNotifee';
 import SongUpdater from './src/components/SongUpdater';
+import DrawerContent from './src/components/DrawerContent';
 
 const Stack = createNativeStackNavigator();
+const Drawer = createDrawerNavigator();
+
+function FeedWithDrawer() {
+  return (
+    <Drawer.Navigator
+      drawerContent={props => <DrawerContent {...props} />}
+      screenOptions={{
+        headerShown: false, // Optional: Show header for drawer
+      }}>
+      <Drawer.Screen name="Feed" component={Feed} />
+      <Drawer.Screen name="Playlist" component={Playlist} />
+      <Drawer.Screen name="Favorite" component={Favorite} />
+      <Drawer.Screen name="CreatePlaylist" component={CreatePlaylist} />
+    </Drawer.Navigator>
+  );
+}
 
 const MyStack = () => {
   return (
@@ -29,8 +49,9 @@ const MyStack = () => {
       <Stack.Navigator
         screenOptions={{
           headerShown: false,
+          // drawerType: "slide",
         }}>
-        <Stack.Screen name="Feed" component={Feed} />
+        <Stack.Screen name="FeedWithDrawer" component={FeedWithDrawer} />
         <Stack.Screen name="Home" component={Home} />
         <Stack.Screen name="Player" component={Player} />
         <Stack.Screen name="Playlist" component={Playlist} />
@@ -44,7 +65,7 @@ const MyStack = () => {
 const App = () => {
   const isDarkMode = useColorScheme() === 'dark';
   return (
-    <>
+    <GestureHandlerRootView>
       <StatusBar
         translucent
         backgroundColor="transparent"
@@ -52,12 +73,12 @@ const App = () => {
       />
       <Provider store={store}>
         <PersistGate loading={<LoadingScreen />} persistor={persistor}>
-          <BgSongNotifee />
           <SongUpdater />
+          <BgSongNotifee />
           <MyStack />
         </PersistGate>
       </Provider>
-    </>
+    </GestureHandlerRootView>
   );
 };
 

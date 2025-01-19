@@ -1,5 +1,6 @@
 import {setCurrentSong} from '../../redux/slices/player.slice';
 import {setPlaying} from '../../redux/slices/playing.slice';
+
 import SoundPlayer from 'react-native-sound-player';
 
 export const playSong = async (songPath, dispatch, currentTime = 0) => {
@@ -14,13 +15,8 @@ export const playSong = async (songPath, dispatch, currentTime = 0) => {
 };
 
 export const pauseSong = dispatch => {
-  try {
-    SoundPlayer.pause();
-    dispatch(setPlaying(false));
-  } catch (error) {
-    console.log('Error in pausing song', error.message);
-    return {message: 'Something went wrong'};
-  }
+  SoundPlayer.pause();
+  dispatch(setPlaying(false));
 };
 
 export const stepForward = (song, songList, dispatch) => {
@@ -75,10 +71,6 @@ export const getCurrentTime = (isPlaying, setToState, time) => {
 };
 
 export const getDuration = async stateToSet => {
-  try {
-    const {duration} = await SoundPlayer.getInfo();
-    stateToSet(duration);
-  } catch (error) {
-    console.error('Error fetching duration:', error);
-  }
+  const {duration} = await SoundPlayer.getInfo();
+  stateToSet(duration || 200);
 };

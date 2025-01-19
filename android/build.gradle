@@ -5,6 +5,7 @@ buildscript {
         compileSdkVersion = 35
         targetSdkVersion = 34
         ndkVersion = "26.1.10909125"
+        // ndkVersion = "23.1.7779620"
         kotlinVersion = "1.9.24"
         ffmpegKitPackage = "full-gpl"
     }
