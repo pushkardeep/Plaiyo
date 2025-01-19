@@ -95,7 +95,7 @@ const Feed = ({navigation}) => {
           {playlists && playlists.length > 0 && (
             <View style={styles.dotsContainer}>
               {playlists.map((_, i) => (
-                <PaginationDots isActive={i == activeIndex} />
+                <PaginationDots key={i} isActive={i == activeIndex} />
               ))}
             </View>
           )}
