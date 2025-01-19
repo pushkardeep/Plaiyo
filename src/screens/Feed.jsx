@@ -46,6 +46,10 @@ const Feed = ({navigation}) => {
     navigation.openDrawer();
   };
 
+  const onPlaylistClick = index => {
+    navigation.navigate('Playlist', {playlistIndex: index});
+  };
+
   const onViewableItemsChanged = ({viewableItems}) => {
     if (viewableItems.length > 0) {
       setActiveIndex(viewableItems[0].index);
@@ -56,9 +60,7 @@ const Feed = ({navigation}) => {
     checkPermission(PERMISSIONS.ANDROID.READ_MEDIA_AUDIO, dispatch);
   }, []);
 
-  useEffect(() => {
-    // getSongs(dispatch);
-  }, [playlists]);
+  useEffect(() => {}, [playlists]);
 
   return (
     <View
@@ -77,7 +79,12 @@ const Feed = ({navigation}) => {
           {playlists && playlists.length > 0 ? (
             <FlatList
               data={playlists}
-              renderItem={playlist => <PlayListCard playlist={playlist.item} />}
+              renderItem={playlist => (
+                <PlayListCard
+                  callback={() => onPlaylistClick(playlist.index)}
+                  playlist={playlist.item}
+                />
+              )}
               contentContainerStyle={{
                 paddingBottom: 50,
               }}
@@ -106,6 +113,7 @@ const Feed = ({navigation}) => {
         <HeadingContainer
           title={'Favorite'}
           isViewAll={true}
+          callback={() => navigation.navigate('Favorite')}
           additionalStyles={{
             marginTop: 25,
             marginBottom: 10,
@@ -124,7 +132,6 @@ const Feed = ({navigation}) => {
           <>
             <HeadingContainer
               title={'All Songs'}
-              isViewAll={true}
               additionalStyles={{
                 marginTop: 25,
                 marginBottom: 10,

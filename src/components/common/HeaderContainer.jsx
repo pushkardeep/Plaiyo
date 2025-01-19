@@ -4,12 +4,12 @@ import {StyleSheet, Text, View, useColorScheme} from 'react-native';
 import MenuButton from '../MenuButton';
 import BackButton from './BackButton';
 
-const HeaderContainer = ({isMenu, menuCallback, isBack, additionalStyles}) => {
+const HeaderContainer = ({isMenu, menuCallback, isBack, backCallback, additionalStyles}) => {
   const isDarkMode = useColorScheme() === 'dark';
   return (
     <View style={[styles.container, {...additionalStyles}]}>
       {isMenu && <MenuButton callback={menuCallback} />}
-      {isBack && <BackButton />}
+      {isBack && <BackButton callback={backCallback} />}
 
       <Text
         style={[styles.playioText, {color: isDarkMode ? 'white' : 'black'}]}>

@@ -13,7 +13,7 @@ import Widget from '../components/common/Widget';
 
 const Favorite = ({navigation}) => {
   const isDarkMode = useColorScheme() === 'dark';
-  const {songs} = useSelector(state => state.songs);
+  const {favorites} = useSelector(state => state.favorites);
   return (
     <View
       style={[
@@ -21,8 +21,12 @@ const Favorite = ({navigation}) => {
         {backgroundColor: isDarkMode ? '#1D1B29' : 'white'},
       ]}>
       <View style={styles.contentContainer}>
-        <HeaderContainer isBack={true} isMenu={false} />
-        {songs && songs.length > 0 ? (
+        <HeaderContainer
+          isBack={true}
+          backCallback={() => navigation.goBack()}
+          isMenu={false}
+        />
+        {favorites && favorites.length > 0 ? (
           <>
             <Text
               style={[
@@ -37,9 +41,11 @@ const Favorite = ({navigation}) => {
             </Text>
             <View style={styles.favoriteContainer}>
               <FlatList
-                data={songs}
+                data={favorites}
                 showsVerticalScrollIndicator={false}
-                renderItem={({item}) => <SongCard song={item} />}
+                renderItem={({item}) => (
+                  <SongCard song={item} isSmallMenu={true} />
+                )}
                 contentContainerStyle={{gap: 10, paddingBottom: 10}}
               />
             </View>
@@ -52,7 +58,7 @@ const Favorite = ({navigation}) => {
         )}
       </View>
 
-      {/* <Widget /> */}
+      <Widget />
 
       <TopColor />
       <MiddleColor />

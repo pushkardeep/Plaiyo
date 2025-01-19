@@ -9,11 +9,11 @@ import {
 } from 'react-native';
 import {temt_1} from '../utils/constants.utils';
 
-const PlayListCard = ({playlist, additionalStyles}) => {
+const PlayListCard = ({playlist, callback, additionalStyles}) => {
   const {width} = Dimensions.get('window');
 
   return (
-    <TouchableOpacity
+    <TouchableOpacity onPress={callback}
       style={[
         styles.container,
         {

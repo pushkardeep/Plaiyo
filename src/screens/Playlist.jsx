@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 import {useSelector} from 'react-redux';
 import {
   StyleSheet,
@@ -16,114 +16,18 @@ import BackButton from '../components/common/BackButton';
 
 import BottomColor from '../components/common/BottomColor';
 import Widget from '../components/common/Widget';
+import SongCard from '../components/SongCard';
 
-const SongCard = song => {
+const PlaylistScreen = ({route, navigation}) => {
   const isDarkMode = useColorScheme() === 'dark';
-  return (
-    <TouchableOpacity
-      style={[
-        styles.songItem,
-        {
-          backgroundColor: isDarkMode
-            ? 'rgba(255, 255, 255, 0.03)'
-            : 'rgba(217, 217, 217, 0.3)',
-        },
-      ]}>
-      <Image source={temt_2} style={styles.songImage} />
+  const {playlists} = useSelector(state => state.playlist);
+  const [playlist, setPlaylist] = useState(null);
 
-      <View style={styles.songInfo}>
-        <Text
-          style={[
-            styles.songTitle,
-            {color: isDarkMode ? '#FFFFFF' : '#000000'},
-          ]}>
-          Song name
-        </Text>
-        <View style={styles.artistContainer}>
-          <LinearGradient
-            colors={
-              isDarkMode ? ['#4527A0', '#6200EA'] : ['#6200EA', '#7C4DFF']
-            }
-            start={{x: 0, y: 0}}
-            end={{x: 1, y: 0}}
-            style={styles.artistBadge}>
-            <Text style={styles.artistName}>Artist name</Text>
-          </LinearGradient>
+  const {playlistIndex} = route.params;
 
-          <View
-            style={[
-              styles.dotSeparator,
-              {backgroundColor: isDarkMode ? '#B0B0B0' : '#6200EA'},
-            ]}
-          />
-          <Text
-            style={[
-              styles.duration,
-              {color: isDarkMode ? '#B0B0B0' : '#6200EA'},
-            ]}>
-            duration
-          </Text>
-        </View>
-      </View>
-
-      <TouchableOpacity
-        style={{
-          borderRadius: 50,
-          overflow: 'hidden',
-          marginRight: 10,
-        }}>
-        <LinearGradient
-          colors={isDarkMode ? ['#4527A0', '#6200EA'] : ['#6200EA', '#7C4DFF']}
-          start={{x: 0, y: 0}}
-          end={{x: 1, y: 0}}
-          style={styles.playButtonCard}>
-          {Icons.FontAwesome5.play(13, 'white')}
-        </LinearGradient>
-      </TouchableOpacity>
-
-      <View
-        style={[
-          styles.seekbarTrack,
-          {
-            backgroundColor: isDarkMode
-              ? 'rgba(255, 255, 255, 0.1)'
-              : 'rgba(217, 217, 217, 0.3)',
-          },
-        ]}>
-        <View
-          style={[
-            styles.seekbarTrackProgress,
-            {backgroundColor: isDarkMode ? 'white' : '#7C4DFF'},
-          ]}></View>
-      </View>
-    </TouchableOpacity>
-  );
-};
-
-const PlaylistScreen = () => {
-  const isDarkMode = useColorScheme() === 'dark';
-  const {songs} = useSelector(state => state.songs);
-  // data //
-  const playlist = {
-    name: "Today's Top Hits",
-    coverImage: 'https://picsum.photos/400',
-    description: 'Your favorite playlist with the best tracks',
-    totalSongs: 25,
-    duration: '1h 45m',
-    songs: [
-      {
-        title: 'Song Name 1',
-        artist: 'Artist Name',
-        duration: '3:45',
-      },
-      {
-        title: 'Song Name 2',
-        artist: 'Artist Name',
-        duration: '4:20',
-      },
-      // Add more songs as needed
-    ],
-  };
+  useEffect(() => {
+    setPlaylist(playlists[playlistIndex]);
+  }, [playlistIndex]);
 
   return (
     <View
@@ -140,10 +44,18 @@ const PlaylistScreen = () => {
                 : ['#6200EA', '#FFFFFF', '#FFFFFF']
             }>
             <View style={styles.playListInfoContainer}>
-              <BackButton additionalStyles={{alignSelf: 'start'}} />
+              <BackButton
+                callback={() => navigation.goBack()}
+                additionalStyles={{alignSelf: 'start'}}
+              />
 
               <View style={styles.coverImageContainer}>
-                <Image source={temt_2} style={styles.coverImage} />
+                <Image
+                  source={
+                    playlist?.cover ? {uri: `file://${playlist.cover}`} : temt_2
+                  }
+                  style={styles.coverImage}
+                />
               </View>
 
               <View style={styles.playlistInfo}>
@@ -152,7 +64,7 @@ const PlaylistScreen = () => {
                     styles.playlistName,
                     {color: isDarkMode ? '#FFFFFF' : '#000000'},
                   ]}>
-                  Anime vibes
+                  {playlist && playlist?.name}
                 </Text>
                 <View style={styles.statsContainer}>
                   {Icons.MaterialCommunityIcons.musicNote(
@@ -164,27 +76,12 @@ const PlaylistScreen = () => {
                       styles.statsText,
                       {color: isDarkMode ? '#E0E0E0' : '#424242'},
                     ]}>
-                    {playlist.totalSongs} songs • {playlist.duration}
+                    {playlist && playlist?.songs?.length} songs
                   </Text>
                 </View>
               </View>
 
               <View style={styles.actionButtons}>
-                <TouchableOpacity
-                  style={[
-                    styles.iconButton,
-                    {
-                      backgroundColor: isDarkMode
-                        ? 'rgba(255,255,255,0.1)'
-                        : 'rgba(0,0,0,0.05)',
-                    },
-                  ]}>
-                  {Icons.AntDesign.heart(
-                    22,
-                    isDarkMode ? '#FFFFFF' : '#000000',
-                  )}
-                </TouchableOpacity>
-
                 <TouchableOpacity style={styles.playButton}>
                   <LinearGradient
                     colors={['#4527A0', '#6200EA']}
@@ -215,9 +112,10 @@ const PlaylistScreen = () => {
           </LinearGradient>
 
           <View style={styles.songsList}>
-            {songs.map((song, index) => (
-              <SongCard key={index} song={song} />
-            ))}
+            {playlist &&
+              playlist.songs.map((song, index) => (
+                <SongCard key={index} song={song} isSmallMenu={true} />
+              ))}
           </View>
         </View>
       </ScrollView>
@@ -318,89 +216,9 @@ const styles = StyleSheet.create({
 
   songsList: {
     paddingTop: 25,
-    paddingHorizontal: 16,
-  },
-
-  songItem: {
-    flex: 1,
-    position: 'relative',
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingVertical: 10,
-    borderRadius: 12,
-    marginBottom: 10,
-  },
-
-  songImage: {
-    width: 55,
-    aspectRatio: 1,
-    borderRadius: 10,
-    marginLeft: 10,
-  },
-
-  songInfo: {
-    flex: 1,
-    marginLeft: 12,
-    gap: 5,
-  },
-
-  songTitle: {
-    fontSize: 16,
-    fontWeight: 'bold',
-  },
-
-  artistContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-
-  artistBadge: {
-    paddingVertical: 6,
-    paddingHorizontal: 10,
-    borderRadius: 12,
-  },
-
-  artistName: {
-    fontSize: 9,
-    color: 'white',
-  },
-
-  dotSeparator: {
-    width: 4,
-    height: 4,
-    borderRadius: 2,
-    marginHorizontal: 4,
-  },
-
-  duration: {
-    fontSize: 10,
-  },
-
-  playButtonCard: {
-    borderRadius: 50,
-    padding: 12,
-    aspectRatio: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-
-  seekbarTrack: {
-    zIndex: 1,
-    width: '90%',
-    height: 2,
-    position: 'absolute',
-    bottom: 0,
-    left: '5%',
-    right: '5%',
-    borderRadius: 10,
-    overflow: 'hidden',
-  },
-
-  seekbarTrackProgress: {
-    width: '50%',
-    height: '100%',
-    borderRadius: 10,
+    paddingHorizontal: 25,
+    gap: 10,
+    paddingBottom: 10,
   },
 });
 
