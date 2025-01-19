@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import React, {useState, useEffect} from 'react';
+import {useDispatch, useSelector} from 'react-redux';
 import {
   StyleSheet,
   Text,
@@ -9,7 +9,7 @@ import {
   useColorScheme,
 } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
-import { Icons, temt_1 } from '../../utils/constants.utils';
+import {Icons, temt_1} from '../../utils/constants.utils';
 import {
   stepForward,
   stepBackward,
@@ -18,18 +18,30 @@ import {
   getCurrentTime,
   getDuration,
 } from '../../services/player/player.service';
+import {setRepeat, setShuffle} from '../../redux/slices/player.slice';
 
 const Widget = () => {
   const dispatch = useDispatch();
   const isDarkMode = useColorScheme() === 'dark';
-  const { isPlaying } = useSelector(state => state.playing);
-  const [isRepeat, setIsRepeat] = useState(false);
+  const {isPlaying} = useSelector(state => state.playing);
+  const {isRepeat, isShuffle} = useSelector(state => state.player);
   const [duration, setDuration] = useState(0);
   const [currentTime, setCurrentTime] = useState(0);
   const [progress, setProgress] = useState(0);
 
-  const { songs } = useSelector(state => state.songs);
-  const { currentSong } = useSelector(state => state.player);
+  const {songs} = useSelector(state => state.songs);
+  const {currentSong} = useSelector(state => state.player);
+
+  const handleRepeat = () => {
+    if (isRepeat) {
+      dispatch(setRepeat(false));
+    } else {
+      dispatch(setRepeat(true));
+      if (isShuffle) {
+        dispatch(setShuffle(false));
+      }
+    }
+  };
 
   useEffect(() => {
     const interval = getCurrentTime(isPlaying, setCurrentTime, 1000);
@@ -54,7 +66,7 @@ const Widget = () => {
     <View
       style={[
         styles.container,
-        { backgroundColor: isDarkMode ? '#1D1B29' : 'white' },
+        {backgroundColor: isDarkMode ? '#1D1B29' : 'white'},
       ]}>
       {/* Progress Bar */}
       <View style={styles.progressContainer}>
@@ -86,7 +98,7 @@ const Widget = () => {
           <Image
             source={
               currentSong.coverImage
-                ? { uri: `file://${currentSong.coverImage}` }
+                ? {uri: `file://${currentSong.coverImage}`}
                 : temt_1
             }
             style={styles.albumArt}
@@ -95,7 +107,7 @@ const Widget = () => {
             <Text
               style={[
                 styles.songTitle,
-                { color: isDarkMode ? '#FFFFFF' : '#000000' },
+                {color: isDarkMode ? '#FFFFFF' : '#000000'},
               ]}
               numberOfLines={1}>
               {currentSong.title || 'unknown'}
@@ -103,7 +115,7 @@ const Widget = () => {
             <Text
               style={[
                 styles.artistName,
-                { color: isDarkMode ? '#B0B0B0' : '#666666' },
+                {color: isDarkMode ? '#B0B0B0' : '#666666'},
               ]}
               numberOfLines={1}>
               {currentSong.artist || 'unknown'}
@@ -113,9 +125,7 @@ const Widget = () => {
 
         {/* Controls */}
         <View style={styles.controls}>
-          <TouchableOpacity
-            style={styles.controlButton}
-            onPress={() => setIsRepeat(!isRepeat)}>
+          <TouchableOpacity style={styles.controlButton} onPress={handleRepeat}>
             {!isRepeat &&
               Icons.MaterialCommunityIcons.repeat(
                 22,
@@ -143,8 +153,8 @@ const Widget = () => {
             }>
             <LinearGradient
               colors={['#7C4DFF', '#6200EA']}
-              start={{ x: 0, y: 0 }}
-              end={{ x: 1, y: 0 }}
+              start={{x: 0, y: 0}}
+              end={{x: 1, y: 0}}
               style={styles.playButtonGradient}>
               {!isPlaying && Icons.FontAwesome5.play(15, 'white')}
               {isPlaying && Icons.MaterialCommunityIcons.pause(24, 'white')}

@@ -62,9 +62,14 @@ export const stepBackward = (song, songList, dispatch) => {
 export const getCurrentTime = (isPlaying, setToState, time) => {
   const interval = setInterval(async () => {
     if (isPlaying) {
-      const {currentTime} = await SoundPlayer.getInfo();
+      const {currentTime, duration} = await SoundPlayer.getInfo();
       setToState(currentTime);
+      if (currentTime >= duration) {
+        clearInterval(interval);
+      }
       return interval;
+    } else {
+      clearInterval(interval);
     }
   }, time);
 };

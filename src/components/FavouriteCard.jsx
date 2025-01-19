@@ -16,7 +16,7 @@ const FavouriteCard = ({song}) => {
 
   const setCurrent = () => {
     dispatch(setCurrentSong(song));
-    if (!isPlaying) {
+    if (!isCurrentPlaying) {
       playSong(song.songPath, dispatch, 0);
     } else {
       pauseSong(dispatch);

@@ -19,6 +19,7 @@ import Playlist from './src/screens/Playlist';
 
 // component
 import BgSongNotifee from './src/components/BgSongNotifee';
+import SongUpdater from './src/components/SongUpdater';
 
 const Stack = createNativeStackNavigator();
 
@@ -52,6 +53,7 @@ const App = () => {
       <Provider store={store}>
         <PersistGate loading={<LoadingScreen />} persistor={persistor}>
           <BgSongNotifee />
+          <SongUpdater />
           <MyStack />
         </PersistGate>
       </Provider>
