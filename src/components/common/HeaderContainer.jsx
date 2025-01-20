@@ -4,7 +4,13 @@ import {StyleSheet, Text, View, useColorScheme} from 'react-native';
 import MenuButton from '../MenuButton';
 import BackButton from './BackButton';
 
-const HeaderContainer = ({isMenu, menuCallback, isBack, backCallback, additionalStyles}) => {
+const HeaderContainer = ({
+  isMenu,
+  menuCallback,
+  isBack,
+  backCallback,
+  additionalStyles,
+}) => {
   const isDarkMode = useColorScheme() === 'dark';
   return (
     <View style={[styles.container, {...additionalStyles}]}>

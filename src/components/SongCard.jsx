@@ -1,5 +1,6 @@
 import React, {useState, useEffect} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
+
 import {
   StyleSheet,
   Text,
@@ -9,14 +10,15 @@ import {
   TouchableOpacity,
 } from 'react-native';
 
-import {Icons} from '../utils/constants.utils';
-
 import {
   updateFavorites,
   removeFromFavorites,
 } from '../redux/slices/favorite.slice';
-import {setCurrentSong} from '../redux/slices/player.slice';
-import {playSong} from '../services/player/player.service';
+import {setCurrentSong, setSongQueue} from '../redux/slices/player.slice';
+import {setPause} from '../redux/slices/playing.slice';
+
+import {Icons} from '../utils/constants.utils';
+import {playSong, stopPlayer} from '../services/player/player.service';
 
 // Menu button
 const SmallMenuButton = ({callback, isDarkMode}) => {
@@ -65,6 +67,7 @@ const SmallMenu = ({isPresent, callback, isDarkMode}) => {
 
 const SongCard = ({
   song,
+  queueSongs,
   isDisable = false,
   isSmallMenu,
   isRadioButton,
@@ -74,14 +77,21 @@ const SongCard = ({
   const dispatch = useDispatch();
   const isDarkMode = useColorScheme() === 'dark';
 
-  const [isOptionOpen, setIsOptionOpen] = useState(false);
   const [isPresent, setIsPresent] = useState(false);
   const [isSelected, setIsSelected] = useState(false);
+  const [isOptionOpen, setIsOptionOpen] = useState(false);
 
   const {favorites} = useSelector(state => state.favorites);
+  const {currentSong} = useSelector(state => state.player);
 
   const setCurrent = () => {
+    // reseting playback states
+    stopPlayer(dispatch);
+    dispatch(setPause(false));
+
+    // setting states for new song
     dispatch(setCurrentSong(song));
+    dispatch(setSongQueue(queueSongs || []));
     playSong(song.songPath, dispatch, 0);
   };
 
@@ -152,6 +162,9 @@ const SongCard = ({
             {song.artist || 'Artist Name'}
           </Text>
         </View>
+
+        {currentSong === song &&
+          Icons.Feather.speaker(18, isDarkMode ? '#7B57E4' : '#4527A0')}
 
         {isSmallMenu && (
           <SmallMenuButton callback={toggleMenu} isDarkMode={isDarkMode} />

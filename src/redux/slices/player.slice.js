@@ -6,6 +6,7 @@ const playerSlice = createSlice({
     currentSong: null,
     isRepeat: false,
     isShuffle: false,
+    queueSongs: [],
   },
 
   reducers: {
@@ -20,8 +21,13 @@ const playerSlice = createSlice({
     setShuffle: (state, action) => {
       state.isShuffle = action.payload;
     },
+
+    setSongQueue: (state, action) => {
+      state.queueSongs = action.payload;
+    },
   },
 });
 
-export const {setCurrentSong, setRepeat, setShuffle} = playerSlice.actions;
+export const {setCurrentSong, setRepeat, setShuffle, setSongQueue} =
+  playerSlice.actions;
 export default playerSlice.reducer;

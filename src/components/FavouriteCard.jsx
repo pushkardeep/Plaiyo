@@ -5,19 +5,24 @@ import {StyleSheet, Text, View, Image} from 'react-native';
 import BlurBgButton from './BlurBgButton';
 import {setCurrentSong} from '../redux/slices/player.slice';
 import {temt_2} from '../utils/constants.utils';
-import {pauseSong, playSong} from '../services/player/player.service';
+import {pauseSong} from '../services/player/player.service';
+
+import {handlePlayback} from '../utils/player.utils';
 
 const FavouriteCard = ({song}) => {
   const dispatch = useDispatch();
+
   const [imageSource, setImageSource] = useState(null);
   const [isCurrentPlaying, setIsCurrentPlaying] = useState(false);
+
   const {isPlaying} = useSelector(state => state.playing);
   const {currentSong} = useSelector(state => state.player);
+  const {isPaused} = useSelector(state => state.playing);
 
   const setCurrent = () => {
     dispatch(setCurrentSong(song));
     if (!isCurrentPlaying) {
-      playSong(song.songPath, dispatch, 0);
+      handlePlayback(isPlaying, isPaused, currentSong, dispatch);
     } else {
       pauseSong(dispatch);
     }
@@ -34,12 +39,12 @@ const FavouriteCard = ({song}) => {
   }, [song]);
 
   useEffect(() => {
-    if (currentSong && isPlaying && song) {
+    if (currentSong && isPlaying && !isPaused && song) {
       setIsCurrentPlaying(currentSong.id === song.id ? true : false);
     } else {
       setIsCurrentPlaying(false);
     }
-  }, [currentSong, isPlaying, song]);
+  }, [currentSong, isPlaying, isPaused, song]);
 
   return (
     <View style={styles.container}>

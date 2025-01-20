@@ -8,21 +8,21 @@ const getSongs = async dispatch => {
   try {
     const {files, success} = await fetchAudioFiles();
     if (success) {
-      const songs = [];
       for (const file of files) {
         if (file.isFile() && file.name.endsWith('.mp3')) {
           const songTextData = await extractMetaDataFromAudio(file.path);
           const songImagePath = await cacheMetaImages(file.path);
-          const songData = {
+          const song = {
             id: `${Date.now()}`,
             songPath: file.path,
             ...songTextData,
             ...songImagePath,
           };
-          songs.push(songData);
+          // songs.push(songData);
+          
+          dispatch(setSongs(song));
         }
       }
-      dispatch(setSongs(songs));
       return {success: true};
     }
 

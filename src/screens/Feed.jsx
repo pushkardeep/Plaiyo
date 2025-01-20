@@ -60,7 +60,10 @@ const Feed = ({navigation}) => {
     checkPermission(PERMISSIONS.ANDROID.READ_MEDIA_AUDIO, dispatch);
   }, []);
 
-  useEffect(() => {}, [playlists]);
+  useEffect(() => {
+    if (!audioReadPermission) return;
+    // getSongs(dispatch)
+  }, [audioReadPermission]);
 
   return (
     <View
@@ -96,7 +99,9 @@ const Feed = ({navigation}) => {
               onViewableItemsChanged={onViewableItemsChanged}
             />
           ) : (
-            <PlayListCard />
+            <PlayListCard
+              callback={() => navigation.navigate('CreatePlaylist')}
+            />
           )}
 
           {playlists && playlists.length > 0 && (
@@ -164,7 +169,7 @@ const Feed = ({navigation}) => {
           <AccessAllower />
         )}
       </View>
-      <Widget />
+      {currentSong && <Widget />}
       <TopColor
         additionalStyles={{left: '0%', transform: 'translate(-0%, -0%)'}}
       />

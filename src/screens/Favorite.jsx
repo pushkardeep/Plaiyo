@@ -14,6 +14,7 @@ import Widget from '../components/common/Widget';
 const Favorite = ({navigation}) => {
   const isDarkMode = useColorScheme() === 'dark';
   const {favorites} = useSelector(state => state.favorites);
+  const {currentSong} = useSelector(state => state.player);
   return (
     <View
       style={[
@@ -44,7 +45,11 @@ const Favorite = ({navigation}) => {
                 data={favorites}
                 showsVerticalScrollIndicator={false}
                 renderItem={({item}) => (
-                  <SongCard song={item} isSmallMenu={true} />
+                  <SongCard
+                    song={item}
+                    queueSongs={favorites}
+                    isSmallMenu={true}
+                  />
                 )}
                 contentContainerStyle={{gap: 10, paddingBottom: 10}}
               />
@@ -58,7 +63,7 @@ const Favorite = ({navigation}) => {
         )}
       </View>
 
-      <Widget />
+      {currentSong && <Widget />}
 
       <TopColor />
       <MiddleColor />

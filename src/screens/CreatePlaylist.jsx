@@ -97,7 +97,7 @@ const CreatePlaylist = ({navigation}) => {
       <View style={styles.contentContainer}>
         {/* Header */}
         <View style={styles.header}>
-          <BackButton />
+          <BackButton callback={() => navigation.goBack()} />
           <Text
             style={[
               styles.headerTitle,

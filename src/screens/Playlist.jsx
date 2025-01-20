@@ -20,7 +20,10 @@ import SongCard from '../components/SongCard';
 
 const PlaylistScreen = ({route, navigation}) => {
   const isDarkMode = useColorScheme() === 'dark';
+
   const {playlists} = useSelector(state => state.playlist);
+  const {currentSong} = useSelector(state => state.player);
+
   const [playlist, setPlaylist] = useState(null);
 
   const {playlistIndex} = route.params;
@@ -119,7 +122,7 @@ const PlaylistScreen = ({route, navigation}) => {
           </View>
         </View>
       </ScrollView>
-      <Widget />
+      {currentSong && <Widget />}
       <BottomColor
         additionalStyles={{left: '100%', transform: 'translate(-100%, -0%)'}}
       />

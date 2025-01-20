@@ -1,12 +1,11 @@
 import {setCurrentSong} from '../../redux/slices/player.slice';
-import {setPlaying} from '../../redux/slices/playing.slice';
+import {setPause, setPlaying} from '../../redux/slices/playing.slice';
 
 import SoundPlayer from 'react-native-sound-player';
 
-export const playSong = async (songPath, dispatch, currentTime = 0) => {
+export const playSong = async (songPath, dispatch) => {
   try {
     SoundPlayer.playUrl(`file://${songPath}`);
-    SoundPlayer.seek(currentTime); // Seek to the current playback position
     dispatch(setPlaying(true));
   } catch (error) {
     console.log('Error in playing song', error.message);
@@ -14,13 +13,25 @@ export const playSong = async (songPath, dispatch, currentTime = 0) => {
   }
 };
 
+export const resumeSong = dispatch => {
+  SoundPlayer.resume();
+  dispatch(setPause(false));
+};
+
 export const pauseSong = dispatch => {
   SoundPlayer.pause();
+  dispatch(setPause(true));
+};
+
+export const stopPlayer = dispatch => {
+  SoundPlayer.stop();
   dispatch(setPlaying(false));
 };
 
 export const stepForward = (song, songList, dispatch) => {
-  if (!song || !songList) return;
+  // reseting the player for next song
+  stopPlayer(dispatch);
+  dispatch(setPause(false));
 
   const index = songList.findIndex(e => e.id === song.id);
 
@@ -38,7 +49,9 @@ export const stepForward = (song, songList, dispatch) => {
 };
 
 export const stepBackward = (song, songList, dispatch) => {
-  if (!song || !songList) return;
+  // reseting the player for previous  song
+  stopPlayer(dispatch);
+  dispatch(setPause(false));
 
   const index = songList.findIndex(e => e.id === song.id);
 
@@ -55,22 +68,51 @@ export const stepBackward = (song, songList, dispatch) => {
   }
 };
 
-export const getCurrentTime = (isPlaying, setToState, time) => {
-  const interval = setInterval(async () => {
-    if (isPlaying) {
+export const getCurrentTime = (isPlaying, isPaused, setToState, time) => {
+  let interval = null;
+
+  if (isPlaying) {
+    interval = setInterval(async () => {
       const {currentTime, duration} = await SoundPlayer.getInfo();
       setToState(currentTime);
-      if (currentTime >= duration) {
+
+      // Clear interval when playback reaches the end
+      if (currentTime >= duration || isPaused) {
         clearInterval(interval);
+
+        if (!isPaused) {
+          SoundPlayer.seek(0);
+        }
       }
-      return interval;
-    } else {
-      clearInterval(interval);
-    }
-  }, time);
+
+    }, time);
+  }
+
+  return () => clearInterval(interval); // Return a cleanup function
 };
 
-export const getDuration = async stateToSet => {
-  const {duration} = await SoundPlayer.getInfo();
-  stateToSet(duration || 200);
+export const getDuration = async (stateToSet, retries = 3, delay = 500) => {
+  let attempt = 0;
+
+  const fetchDuration = async () => {
+    try {
+      const { duration } = await SoundPlayer.getInfo();
+      if (duration) {
+        stateToSet(duration);
+        return true;
+      }
+      throw new Error('Duration not available');
+    } catch (error) {
+      if (attempt < retries) {
+        attempt++;
+        await new Promise(resolve => setTimeout(resolve, delay));
+        return fetchDuration();
+      } else {
+        stateToSet(200);
+        return false;
+      }
+    }
+  };
+
+  return fetchDuration();
 };

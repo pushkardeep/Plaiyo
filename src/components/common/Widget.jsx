@@ -1,52 +1,45 @@
 import React, {useState, useEffect} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
+
 import {
-  StyleSheet,
   Text,
   View,
   Image,
+  StyleSheet,
   TouchableOpacity,
   useColorScheme,
 } from 'react-native';
-import LinearGradient from 'react-native-linear-gradient';
-import {Icons, temt_1} from '../../utils/constants.utils';
+
 import {
+  getDuration,
   stepForward,
   stepBackward,
-  playSong,
-  pauseSong,
   getCurrentTime,
-  getDuration,
 } from '../../services/player/player.service';
-import {setRepeat, setShuffle} from '../../redux/slices/player.slice';
+
+import {handlePlayback, handleRepeat} from '../../utils/player.utils';
+import {Icons, temt_2} from '../../utils/constants.utils';
+
+import LinearGradient from 'react-native-linear-gradient';
 
 const Widget = () => {
   const dispatch = useDispatch();
   const isDarkMode = useColorScheme() === 'dark';
-  const {isPlaying} = useSelector(state => state.playing);
-  const {isRepeat, isShuffle} = useSelector(state => state.player);
-  const [duration, setDuration] = useState(0);
-  const [currentTime, setCurrentTime] = useState(0);
-  const [progress, setProgress] = useState(0);
 
   const {songs} = useSelector(state => state.songs);
-  const {currentSong} = useSelector(state => state.player);
+  const {isPlaying, isPaused} = useSelector(state => state.playing);
+  const {isRepeat, isShuffle, currentSong, queueSongs} = useSelector(
+    state => state.player,
+  );
 
-  const handleRepeat = () => {
-    if (isRepeat) {
-      dispatch(setRepeat(false));
-    } else {
-      dispatch(setRepeat(true));
-      if (isShuffle) {
-        dispatch(setShuffle(false));
-      }
-    }
-  };
+  const [duration, setDuration] = useState(0);
+  const [progress, setProgress] = useState(0);
+  const [currentTime, setCurrentTime] = useState(0);
 
   useEffect(() => {
-    const interval = getCurrentTime(isPlaying, setCurrentTime, 1000);
-    return () => clearInterval(interval);
-  }, [isPlaying]);
+    const cleanup = getCurrentTime(isPlaying, isPaused, setCurrentTime, 1000);
+    return cleanup;
+  }, [isPlaying, currentSong, isPaused]);
 
   useEffect(() => {
     if (isPlaying && currentSong) {
@@ -60,7 +53,7 @@ const Widget = () => {
     } else {
       setProgress(0);
     }
-  }, [duration, currentTime]);
+  }, [duration, currentTime, currentSong]);
 
   return (
     <View
@@ -68,7 +61,6 @@ const Widget = () => {
         styles.container,
         {backgroundColor: isDarkMode ? '#1D1B29' : 'white'},
       ]}>
-      {/* Progress Bar */}
       <View style={styles.progressContainer}>
         <View
           style={[
@@ -91,15 +83,13 @@ const Widget = () => {
         </View>
       </View>
 
-      {/* Content */}
       <View style={styles.content}>
-        {/* Song Info */}
         <TouchableOpacity style={styles.songInfo}>
           <Image
             source={
-              currentSong.coverImage
+              currentSong?.coverImage
                 ? {uri: `file://${currentSong.coverImage}`}
-                : temt_1
+                : temt_2
             }
             style={styles.albumArt}
           />
@@ -110,7 +100,7 @@ const Widget = () => {
                 {color: isDarkMode ? '#FFFFFF' : '#000000'},
               ]}
               numberOfLines={1}>
-              {currentSong.title || 'unknown'}
+              {currentSong?.title || 'unknown'}
             </Text>
             <Text
               style={[
@@ -118,14 +108,15 @@ const Widget = () => {
                 {color: isDarkMode ? '#B0B0B0' : '#666666'},
               ]}
               numberOfLines={1}>
-              {currentSong.artist || 'unknown'}
+              {currentSong?.artist || 'unknown'}
             </Text>
           </View>
         </TouchableOpacity>
 
-        {/* Controls */}
         <View style={styles.controls}>
-          <TouchableOpacity style={styles.controlButton} onPress={handleRepeat}>
+          <TouchableOpacity
+            style={styles.controlButton}
+            onPress={() => handleRepeat(isRepeat, isShuffle, dispatch)}>
             {!isRepeat &&
               Icons.MaterialCommunityIcons.repeat(
                 22,
@@ -137,7 +128,13 @@ const Widget = () => {
 
           <TouchableOpacity
             style={styles.controlButton}
-            onPress={() => stepBackward(currentSong, songs, dispatch)}>
+            onPress={() =>
+              stepBackward(
+                currentSong,
+                queueSongs?.length > 0 ? queueSongs : songs,
+                dispatch,
+              )
+            }>
             {Icons.AntDesign.stepbackward(
               17,
               isDarkMode ? '#FFFFFF' : '#BAA8ED',
@@ -147,23 +144,30 @@ const Widget = () => {
           <TouchableOpacity
             style={styles.playButton}
             onPress={() =>
-              !isPlaying
-                ? playSong(currentSong.songPath, dispatch, currentTime)
-                : pauseSong(dispatch)
+              handlePlayback(isPlaying, isPaused, currentSong, dispatch)
             }>
             <LinearGradient
               colors={['#7C4DFF', '#6200EA']}
               start={{x: 0, y: 0}}
               end={{x: 1, y: 0}}
               style={styles.playButtonGradient}>
-              {!isPlaying && Icons.FontAwesome5.play(15, 'white')}
-              {isPlaying && Icons.MaterialCommunityIcons.pause(24, 'white')}
+              {isPlaying
+                ? isPaused
+                  ? Icons.FontAwesome5.play(15, 'white')
+                  : Icons.MaterialCommunityIcons.pause(24, 'white')
+                : Icons.FontAwesome5.play(15, 'white')}
             </LinearGradient>
           </TouchableOpacity>
 
           <TouchableOpacity
             style={styles.controlButton}
-            onPress={() => stepForward(currentSong, songs, dispatch)}>
+            onPress={() =>
+              stepForward(
+                currentSong,
+                queueSongs?.length > 0 ? queueSongs : songs,
+                dispatch,
+              )
+            }>
             {Icons.AntDesign.stepforward(
               17,
               isDarkMode ? '#FFFFFF' : '#BAA8ED',
