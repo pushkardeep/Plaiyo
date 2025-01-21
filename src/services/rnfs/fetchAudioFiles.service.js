@@ -2,8 +2,20 @@ import RNFS from 'react-native-fs';
 
 export const fetchAudioFiles = async () => {
   try {
+    const files = [];
     const musicDir = `${RNFS.ExternalStorageDirectoryPath}/Music`;
-    const files = await RNFS.readDir(musicDir);
+
+    if (!RNFS.exists(musicDir)) {
+      return {success: false, error: 'Music folder not found'};
+    }
+
+    const data = await RNFS.readDir(musicDir);
+
+    for (const file of data) {
+      if (file.isFile() && file.name.endsWith('.mp3')) {
+        files.push(file);
+      }
+    }
 
     return {success: true, files};
   } catch (error) {

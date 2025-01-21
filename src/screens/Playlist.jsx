@@ -117,7 +117,12 @@ const PlaylistScreen = ({route, navigation}) => {
           <View style={styles.songsList}>
             {playlist &&
               playlist.songs.map((song, index) => (
-                <SongCard key={index} song={song} isSmallMenu={true} />
+                <SongCard
+                  key={index}
+                  song={song}
+                  queueSongs={playlist?.songs}
+                  isSmallMenu={true}
+                />
               ))}
           </View>
         </View>

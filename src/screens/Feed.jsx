@@ -11,7 +11,7 @@ import FavouriteCard from '../components/FavouriteCard';
 // methods
 import {PERMISSIONS} from 'react-native-permissions';
 import {checkPermission} from '../utils/permissions.utils';
-import {getSongs} from '../services/songs/songs.service';
+import {initializeSongs} from '../services/songs/songs.service';
 
 import TopColor from '../components/common/TopColor';
 import MiddleColor from '../components/common/MiddleColor';
@@ -62,7 +62,7 @@ const Feed = ({navigation}) => {
 
   useEffect(() => {
     if (!audioReadPermission) return;
-    // getSongs(dispatch)
+    initializeSongs(songs, dispatch);
   }, [audioReadPermission]);
 
   return (
@@ -148,7 +148,7 @@ const Feed = ({navigation}) => {
               <FlatList
                 data={songs}
                 renderItem={({item}) => (
-                  <SongCard song={item} isSmallMenu={true} />
+                  <SongCard song={item} queueSongs={songs} isSmallMenu={true} />
                 )}
                 showsVerticalScrollIndicator={false}
                 keyExtractor={(_, index) => index.toString()}
