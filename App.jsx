@@ -14,7 +14,7 @@ import {GestureHandlerRootView} from 'react-native-gesture-handler';
 // screens
 import Home from './src/screens/Home';
 import Feed from './src/screens/Feed';
-import Player from './src/screens/Player';
+
 import Favorite from './src/screens/Favorite';
 import CreatePlaylist from './src/screens/CreatePlaylist';
 import LoadingScreen from './src/components/LoadingScreen';
@@ -53,7 +53,6 @@ const MyStack = () => {
         }}>
         <Stack.Screen name="FeedWithDrawer" component={FeedWithDrawer} />
         <Stack.Screen name="Home" component={Home} />
-        <Stack.Screen name="Player" component={Player} />
         <Stack.Screen name="Playlist" component={Playlist} />
         <Stack.Screen name="Favorite" component={Favorite} />
         <Stack.Screen name="CreatePlaylist" component={CreatePlaylist} />

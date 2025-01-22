@@ -75,16 +75,6 @@ export const getCurrentTime = (isPlaying, isPaused, setToState, time) => {
     interval = setInterval(async () => {
       const {currentTime, duration} = await SoundPlayer.getInfo();
       setToState(currentTime);
-
-      // Clear interval when playback reaches the end
-      if (currentTime >= duration || isPaused) {
-        clearInterval(interval);
-
-        if (!isPaused) {
-          SoundPlayer.seek(0);
-        }
-      }
-
     }, time);
   }
 
@@ -96,7 +86,7 @@ export const getDuration = async (stateToSet, retries = 3, delay = 500) => {
 
   const fetchDuration = async () => {
     try {
-      const { duration } = await SoundPlayer.getInfo();
+      const {duration} = await SoundPlayer.getInfo();
       if (duration) {
         stateToSet(duration);
         return true;

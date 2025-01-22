@@ -6,8 +6,8 @@ import {
   View,
   Image,
   StyleSheet,
-  TouchableOpacity,
   useColorScheme,
+  TouchableOpacity,
 } from 'react-native';
 
 import {
@@ -21,10 +21,17 @@ import {handlePlayback, handleRepeat} from '../../utils/player.utils';
 import {Icons, temt_2} from '../../utils/constants.utils';
 
 import LinearGradient from 'react-native-linear-gradient';
+import Animated, {
+  useSharedValue,
+  useAnimatedStyle,
+  withSpring,
+} from 'react-native-reanimated';
 
-const Widget = () => {
+const Widget = ({callback}) => {
   const dispatch = useDispatch();
   const isDarkMode = useColorScheme() === 'dark';
+
+  const translateY = useSharedValue('100%');
 
   const {songs} = useSelector(state => state.songs);
   const {isPlaying, isPaused} = useSelector(state => state.playing);
@@ -55,10 +62,19 @@ const Widget = () => {
     }
   }, [duration, currentTime, currentSong]);
 
+  const animatedStyles = useAnimatedStyle(() => ({
+    transform: [{translateY: translateY.value}],
+  }));
+
+  useEffect(() => {
+    translateY.value = withSpring('0%', {damping: 17});
+  }, []);
+
   return (
-    <View
+    <Animated.View
       style={[
         styles.container,
+        animatedStyles,
         {backgroundColor: isDarkMode ? '#1D1B29' : 'white'},
       ]}>
       <View style={styles.progressContainer}>
@@ -84,7 +100,7 @@ const Widget = () => {
       </View>
 
       <View style={styles.content}>
-        <TouchableOpacity style={styles.songInfo}>
+        <TouchableOpacity style={styles.songInfo} onPress={callback}>
           <Image
             source={
               currentSong?.coverImage
@@ -175,12 +191,13 @@ const Widget = () => {
           </TouchableOpacity>
         </View>
       </View>
-    </View>
+    </Animated.View>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
+    zIndex: 1,
     width: '100%',
     shadowColor: '#000000',
     shadowOffset: {
@@ -190,6 +207,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.25,
     shadowRadius: 20.0,
     elevation: 24,
+    overflow: 'hidden',
   },
 
   progressContainer: {

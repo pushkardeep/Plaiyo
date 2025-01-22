@@ -32,6 +32,7 @@ export const Icons = {
     ),
 
     pause: (size, color) => <Ionicons name="pause" size={size} color={color} />,
+    play: (size, color) => <Ionicons name="play" size={size} color={color} />,
 
     shuffle: (size, color) => (
       <Ionicons name="shuffle" size={size} color={color} />

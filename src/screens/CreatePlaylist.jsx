@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
 import {
   StyleSheet,
@@ -24,16 +24,13 @@ import {Icons} from '../utils/constants.utils';
 const CreatePlaylist = ({navigation}) => {
   const dispatch = useDispatch();
   const isDarkMode = useColorScheme() === 'dark';
-  const [playlist, setPlaylist] = useState({
-    cover: '',
-    name: '',
-    songs: [],
-  });
+
   const [playlistImage, setPlaylistImage] = useState(null);
   const [playlistName, setPlaylistName] = useState('');
 
   const [selectedSongs, setSelectedSongs] = useState([]);
   const [isAllSelected, setIsAllSelected] = useState(false);
+  const [isFormValid, setIsFormValid] = useState(false);
 
   const {songs} = useSelector(state => state.songs);
 
@@ -84,9 +81,19 @@ const CreatePlaylist = ({navigation}) => {
     };
 
     dispatch(createPlaylists(newPlaylist));
+    setPlaylistName('');
+    setPlaylistImage(null);
+    setSelectedSongs([]);
+    setIsAllSelected(false);
 
     navigation.goBack();
   };
+
+  useEffect(() => {
+    setIsFormValid(
+      playlistImage && playlistName && selectedSongs.length > 0 ? true : false,
+    );
+  }, [playlistImage, playlistName, selectedSongs]);
 
   return (
     <View
@@ -214,10 +221,14 @@ const CreatePlaylist = ({navigation}) => {
         {/* Bottom Button */}
         <View style={styles.bottomContainer}>
           <TouchableOpacity
+            disabled={!isFormValid}
             onPress={handleSubmit}
             style={[
               styles.createButton,
-              {backgroundColor: isDarkMode ? '#7B57E4' : '#4527A0'},
+              {
+                backgroundColor: isDarkMode ? '#7B57E4' : '#4527A0',
+                opacity: !isFormValid ? 0.5 : 1,
+              },
             ]}>
             <Text style={styles.createButtonText}>Create Playlist</Text>
           </TouchableOpacity>
@@ -360,7 +371,7 @@ const styles = StyleSheet.create({
   songsContainer: {
     marginTop: 15,
     gap: 12,
-    marginBottom: 15,
+    marginBottom: 37,
   },
 
   bottomContainer: {

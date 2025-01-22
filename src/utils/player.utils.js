@@ -28,3 +28,14 @@ export const handleRepeat = (isRepeat, isShuffle, dispatch) => {
     }
   }
 };
+
+export const handleShuffle = (isRepeat, isShuffle, dispatch) => {
+  if (isShuffle) {
+    dispatch(setShuffle(false));
+  } else {
+    dispatch(setShuffle(true));
+    if (isRepeat) {
+      dispatch(setRepeat(false));
+    }
+  }
+};

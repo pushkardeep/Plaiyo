@@ -25,9 +25,7 @@ import PaginationDots from '../components/PaginationDots';
 import Widget from '../components/common/Widget';
 
 import {temt_2} from '../utils/constants.utils';
-
-import SoundPlayer from 'react-native-sound-player';
-import {setPlaying} from '../redux/slices/playing.slice';
+import Player from '../components/Player';
 
 const Feed = ({navigation}) => {
   const dispatch = useDispatch();
@@ -41,6 +39,8 @@ const Feed = ({navigation}) => {
   const {currentSong} = useSelector(state => state.player);
   const {playlists} = useSelector(state => state.playlist);
   const {favorites} = useSelector(state => state.favorites);
+
+  const [isPlayerOpen, setIsPlayerOpen] = useState(false);
 
   const handleDrawer = navigation => {
     navigation.openDrawer();
@@ -169,7 +169,8 @@ const Feed = ({navigation}) => {
           <AccessAllower />
         )}
       </View>
-      {currentSong && <Widget />}
+      {currentSong && <Widget callback={() => setIsPlayerOpen(true)} />}
+      {isPlayerOpen && <Player setOpenState={setIsPlayerOpen} />}
       <TopColor
         additionalStyles={{left: '0%', transform: 'translate(-0%, -0%)'}}
       />

@@ -25,8 +25,10 @@ const SongManager = () => {
 
   const playRandomSong = () => {
     const randomIndex = Math.floor(
-      Math.random() * queueSongs.length > 0 ? queueSongs.length : songs.length,
+      Math.random() *
+        (queueSongs.length > 0 ? queueSongs.length : songs.length),
     );
+
     dispatch(
       setCurrentSong(
         queueSongs.length > 0 ? queueSongs[randomIndex] : songs[randomIndex],

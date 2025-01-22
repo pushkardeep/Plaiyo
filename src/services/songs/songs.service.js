@@ -4,6 +4,8 @@ import {cacheMetaImages} from '../rnfs/cacheMetaImages.service';
 
 import {setSongs, removeSongs} from '../../redux/slices/songs.slice';
 import {deleteFile} from '../rnfs/delete.service';
+import {removeDeletedFavouriteSongs} from '../../redux/slices/favorite.slice';
+import {removeDeletedPlaylistSongs} from '../../redux/slices/playlist.slice';
 
 // Main function to initialize songs
 const initializeSongs = async (existingSongs, dispatch) => {
@@ -126,6 +128,8 @@ const removeDeletedSongs = async (existingSongs, audioFiles, dispatch) => {
     if (songsToRemove.length === 0) return {success: true};
 
     dispatch(removeSongs(songsToRemove));
+    dispatch(removeDeletedFavouriteSongs(songsToRemove));
+    dispatch(removeDeletedPlaylistSongs(songsToRemove));
 
     const deletionResults = await Promise.allSettled(
       songsToRemove.map(async song => {
