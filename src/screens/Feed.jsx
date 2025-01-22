@@ -35,7 +35,6 @@ const Feed = ({navigation}) => {
   const [activeIndex, setActiveIndex] = useState(0);
   const {songs} = useSelector(state => state.songs);
   const {audioReadPermission} = useSelector(state => state.permission);
-  const {isPlaying} = useSelector(state => state.playing);
   const {currentSong} = useSelector(state => state.player);
   const {playlists} = useSelector(state => state.playlist);
   const {favorites} = useSelector(state => state.favorites);
@@ -117,7 +116,7 @@ const Feed = ({navigation}) => {
 
         <HeadingContainer
           title={'Favorite'}
-          isViewAll={true}
+          isViewAll={favorites?.length > 2}
           callback={() => navigation.navigate('Favorite')}
           additionalStyles={{
             marginTop: 25,

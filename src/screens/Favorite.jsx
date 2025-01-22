@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useState} from 'react';
 import {useSelector} from 'react-redux';
 import {StyleSheet, Text, View, useColorScheme, FlatList} from 'react-native';
 
@@ -10,11 +10,14 @@ import SongCard from '../components/SongCard';
 import HeaderContainer from '../components/common/HeaderContainer';
 import NothingFound from '../components/common/NothingFound';
 import Widget from '../components/common/Widget';
+import Player from '../components/Player';
 
 const Favorite = ({navigation}) => {
   const isDarkMode = useColorScheme() === 'dark';
   const {favorites} = useSelector(state => state.favorites);
   const {currentSong} = useSelector(state => state.player);
+
+  const [isPlayerOpen, setIsPlayerOpen] = useState(false);
   return (
     <View
       style={[
@@ -63,7 +66,8 @@ const Favorite = ({navigation}) => {
         )}
       </View>
 
-      {currentSong && <Widget />}
+      {currentSong && <Widget callback={() => setIsPlayerOpen(true)} />}
+      {isPlayerOpen && <Player setOpenState={setIsPlayerOpen} />}
 
       <TopColor />
       <MiddleColor />

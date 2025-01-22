@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import {useSelector} from 'react-redux';
+import {useDispatch, useSelector} from 'react-redux';
 import {
   StyleSheet,
   Text,
@@ -17,16 +17,30 @@ import BackButton from '../components/common/BackButton';
 import BottomColor from '../components/common/BottomColor';
 import Widget from '../components/common/Widget';
 import SongCard from '../components/SongCard';
+import Player from '../components/Player';
+import {handleShuffle} from '../utils/player.utils';
+import {setSongQueue} from '../redux/slices/player.slice';
+import {playSong} from '../services/player/player.service';
 
 const PlaylistScreen = ({route, navigation}) => {
+  const dispatch = useDispatch();
   const isDarkMode = useColorScheme() === 'dark';
 
   const {playlists} = useSelector(state => state.playlist);
-  const {currentSong} = useSelector(state => state.player);
+  const {currentSong, isShuffle, isRepeat} = useSelector(state => state.player);
 
   const [playlist, setPlaylist] = useState(null);
+  const [isPlayerOpen, setIsPlayerOpen] = useState(false);
 
   const {playlistIndex} = route.params;
+
+  const playAll = () => {
+    dispatch(setSongQueue(playlist?.songs));
+    if (isShuffle) {
+      const randomIndex = Math.floor(Math.random() * playlist?.songs?.length);
+      playSong(playlist?.songs[randomIndex]?.songPath);
+    }
+  };
 
   useEffect(() => {
     setPlaylist(playlists[playlistIndex]);
@@ -85,7 +99,7 @@ const PlaylistScreen = ({route, navigation}) => {
               </View>
 
               <View style={styles.actionButtons}>
-                <TouchableOpacity style={styles.playButton}>
+                <TouchableOpacity style={styles.playButton} onPress={playAll}>
                   <LinearGradient
                     colors={['#4527A0', '#6200EA']}
                     start={{x: 0, y: 0}}
@@ -97,6 +111,7 @@ const PlaylistScreen = ({route, navigation}) => {
                 </TouchableOpacity>
 
                 <TouchableOpacity
+                  onPress={() => handleShuffle(isRepeat, isShuffle, dispatch)}
                   style={[
                     styles.iconButton,
                     {
@@ -107,7 +122,13 @@ const PlaylistScreen = ({route, navigation}) => {
                   ]}>
                   {Icons.Ionicons.shuffle(
                     22,
-                    isDarkMode ? '#FFFFFF' : '#000000',
+                    isShuffle
+                      ? isDarkMode
+                        ? '#7B57E4'
+                        : '#4527A0'
+                      : isDarkMode
+                      ? '#FFFFFF'
+                      : '#000000',
                   )}
                 </TouchableOpacity>
               </View>
@@ -127,7 +148,10 @@ const PlaylistScreen = ({route, navigation}) => {
           </View>
         </View>
       </ScrollView>
-      {currentSong && <Widget />}
+
+      {currentSong && <Widget callback={() => setIsPlayerOpen(true)} />}
+      {isPlayerOpen && <Player setOpenState={setIsPlayerOpen} />}
+
       <BottomColor
         additionalStyles={{left: '100%', transform: 'translate(-100%, -0%)'}}
       />

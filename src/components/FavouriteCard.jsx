@@ -5,9 +5,7 @@ import {StyleSheet, Text, View, Image} from 'react-native';
 import BlurBgButton from './BlurBgButton';
 import {setCurrentSong} from '../redux/slices/player.slice';
 import {temt_2} from '../utils/constants.utils';
-import {pauseSong} from '../services/player/player.service';
-
-import {handlePlayback} from '../utils/player.utils';
+import {pauseSong, playSong} from '../services/player/player.service';
 
 const FavouriteCard = ({song}) => {
   const dispatch = useDispatch();
@@ -21,10 +19,14 @@ const FavouriteCard = ({song}) => {
 
   const setCurrent = () => {
     dispatch(setCurrentSong(song));
-    if (!isCurrentPlaying) {
-      handlePlayback(isPlaying, isPaused, currentSong, dispatch);
+    if (isCurrentPlaying) {
+      if (isPaused) {
+        resumeSong(dispatch);
+      } else {
+        pauseSong(dispatch);
+      }
     } else {
-      pauseSong(dispatch);
+      playSong(song?.songPath, dispatch);
     }
   };
 
