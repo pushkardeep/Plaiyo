@@ -3,12 +3,10 @@ import {StyleSheet, View, FlatList, useColorScheme} from 'react-native';
 
 import {useSelector, useDispatch} from 'react-redux';
 
-// components
 import SongCard from '../components/SongCard';
 import PlayListCard from '../components/PlayListCard';
 import FavouriteCard from '../components/FavouriteCard';
 
-// methods
 import {PERMISSIONS} from 'react-native-permissions';
 import {checkPermission} from '../utils/permissions.utils';
 import {initializeSongs} from '../services/songs/songs.service';
@@ -23,8 +21,6 @@ import AccessAllower from '../components/AccessAllower';
 import NothingFound from '../components/common/NothingFound';
 import PaginationDots from '../components/PaginationDots';
 import Widget from '../components/common/Widget';
-
-import {temt_2} from '../utils/constants.utils';
 import Player from '../components/Player';
 
 const Feed = ({navigation}) => {
@@ -71,69 +67,73 @@ const Feed = ({navigation}) => {
         {backgroundColor: isDarkMode ? '#1D1B29' : 'white'},
       ]}>
       <View style={styles.contentContainer}>
-        <HeaderContainer
-          isMenu={true}
-          menuCallback={() => handleDrawer(navigation)}
-          additionalStyles={{marginBottom: 25, paddingHorizontal: 25}}
-        />
-
-        <View>
-          {playlists && playlists.length > 0 ? (
-            <FlatList
-              data={playlists}
-              renderItem={playlist => (
-                <PlayListCard
-                  callback={() => onPlaylistClick(playlist.index)}
-                  playlist={playlist.item}
-                />
-              )}
-              contentContainerStyle={{
-                paddingBottom: 50,
-              }}
-              pagingEnabled
-              horizontal
-              showsHorizontalScrollIndicator={false}
-              keyExtractor={(_, index) => index.toString()}
-              viewabilityConfig={{itemVisiblePercentThreshold: 50}}
-              onViewableItemsChanged={onViewableItemsChanged}
-            />
-          ) : (
-            <PlayListCard
-              callback={() => navigation.navigate('CreatePlaylist')}
-            />
-          )}
-
-          {playlists && playlists.length > 0 && (
-            <View style={styles.dotsContainer}>
-              {playlists.map((_, i) => (
-                <PaginationDots key={i} isActive={i == activeIndex} />
-              ))}
-            </View>
-          )}
-        </View>
-
-        {/* Favorites  */}
-
-        <HeadingContainer
-          title={'Favorite'}
-          isViewAll={favorites?.length > 2}
-          callback={() => navigation.navigate('Favorite')}
-          additionalStyles={{
-            marginTop: 25,
-            marginBottom: 10,
-            paddingHorizontal: 25,
-          }}
-        />
-
-        <View style={styles.favouriteContainer}>
-          <FavouriteCard song={favorites[0]} />
-          <FavouriteCard song={favorites[1]} />
-        </View>
-
         {/* songs  */}
 
         {songs && songs.length > 0 ? (
           <>
+            {/* playlist cards  */}
+
+            <HeaderContainer
+              isMenu={true}
+              menuCallback={() => handleDrawer(navigation)}
+              additionalStyles={{marginBottom: 25, paddingHorizontal: 25}}
+            />
+
+            <View>
+              {playlists && playlists.length > 0 ? (
+                <FlatList
+                  data={playlists}
+                  renderItem={playlist => (
+                    <PlayListCard
+                      callback={() => onPlaylistClick(playlist.index)}
+                      playlist={playlist.item}
+                    />
+                  )}
+                  contentContainerStyle={{
+                    paddingBottom: 50,
+                  }}
+                  pagingEnabled
+                  horizontal
+                  showsHorizontalScrollIndicator={false}
+                  keyExtractor={(_, index) => index.toString()}
+                  viewabilityConfig={{itemVisiblePercentThreshold: 50}}
+                  onViewableItemsChanged={onViewableItemsChanged}
+                />
+              ) : (
+                <PlayListCard
+                  callback={() => navigation.navigate('CreatePlaylist')}
+                />
+              )}
+
+              {playlists && playlists.length > 0 && (
+                <View style={styles.dotsContainer}>
+                  {playlists.map((_, i) => (
+                    <PaginationDots key={i} isActive={i == activeIndex} />
+                  ))}
+                </View>
+              )}
+            </View>
+
+            {/* Favorites  */}
+
+            <HeadingContainer
+              title={'Favorite'}
+              isViewAll={favorites?.length > 2}
+              callback={() => navigation.navigate('Favorite')}
+              additionalStyles={{
+                marginTop: 25,
+                marginBottom: 10,
+                paddingHorizontal: 25,
+              }}
+            />
+
+            <View style={styles.favouriteContainer}>
+              <FavouriteCard song={favorites[0]} />
+              <FavouriteCard song={favorites[1]} />
+            </View>
+
+            {/* All songs  */}
+
             <HeadingContainer
               title={'All Songs'}
               additionalStyles={{

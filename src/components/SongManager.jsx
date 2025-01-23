@@ -10,6 +10,8 @@ import {
 import {setCurrentSong} from '../redux/slices/player.slice';
 import {setPause, setPlaying} from '../redux/slices/playing.slice';
 
+import {checkExists} from '../services/rnfs/rnfs.service';
+
 import SoundPlayer from 'react-native-sound-player';
 
 const SongManager = () => {
@@ -40,6 +42,17 @@ const SongManager = () => {
         : songs[randomIndex].songPath,
       dispatch,
     );
+  };
+
+  const checkSongExist = async () => {
+    const {success, exists} = await checkExists(currentSong?.songPath);
+    if (success) {
+      if (!exists) {
+        dispatch(setCurrentSong(null));
+      }
+    } else {
+      dispatch(setCurrentSong(null));
+    }
   };
 
   useEffect(() => {
@@ -75,6 +88,11 @@ const SongManager = () => {
     dispatch(setPlaying(false));
     dispatch(setPause(false));
   }, []);
+
+  useEffect(() => {
+    if (!currentSong) return;
+    checkSongExist();
+  }, [currentSong]);
 
   return null;
 };

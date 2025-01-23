@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 import {
   StyleSheet,
   Text,
@@ -8,12 +8,33 @@ import {
   TouchableOpacity,
 } from 'react-native';
 import {temt_1} from '../utils/constants.utils';
+import {checkExists} from '../services/rnfs/rnfs.service';
 
 const PlayListCard = ({playlist, callback, additionalStyles}) => {
   const {width} = Dimensions.get('window');
+  const [isImageExists, setIsImageExists] = useState(false);
+
+  const checkImageExists = async path => {
+    const {success, exists} = await checkExists(path);
+    if (success) {
+      if (exists) {
+        setIsImageExists(true);
+      } else {
+        setIsImageExists(false);
+      }
+    } else {
+      setIsImageExists(false);
+    }
+  };
+
+  useEffect(() => {
+    if (!playlist?.cover) return setIsImageExists(false);
+    checkImageExists(playlist?.cover);
+  }, [playlist]);
 
   return (
-    <TouchableOpacity onPress={callback}
+    <TouchableOpacity
+      onPress={callback}
       style={[
         styles.container,
         {
@@ -25,15 +46,13 @@ const PlayListCard = ({playlist, callback, additionalStyles}) => {
       <View style={{width: '90%', height: '100%'}}>
         <Image
           resizeMode="cover"
-          source={playlist?.cover ? {uri: `file://${playlist.cover}`} : temt_1}
+          source={isImageExists ? {uri: `file://${playlist.cover}`} : temt_1}
           style={[styles.playlistImg, {zIndex: 1, opacity: playlist ? 1 : 0.4}]}
         />
         {playlist && (
           <Image
             resizeMode="cover"
-            source={
-              playlist?.cover ? {uri: `file://${playlist.cover}`} : temt_1
-            }
+            source={isImageExists ? {uri: `file://${playlist.cover}`} : temt_1}
             style={[styles.playlistImgShadow]}
           />
         )}

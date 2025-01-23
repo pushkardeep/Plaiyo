@@ -6,6 +6,8 @@ const playerSlice = createSlice({
     currentSong: null,
     isRepeat: false,
     isShuffle: false,
+    isPlaylist: false,
+    playlistId: "",
     queueSongs: [],
   },
 
@@ -25,9 +27,23 @@ const playerSlice = createSlice({
     setSongQueue: (state, action) => {
       state.queueSongs = action.payload;
     },
+
+    setIsPlaylist: (state, action) => {
+      state.isPlaylist = action.payload;
+    },
+
+    setPlaylistId: (state, action) => {
+      state.playlistId = action.payload;
+    },
   },
 });
 
-export const {setCurrentSong, setRepeat, setShuffle, setSongQueue} =
-  playerSlice.actions;
+export const {
+  setCurrentSong,
+  setRepeat,
+  setShuffle,
+  setSongQueue,
+  setIsPlaylist,
+  setPlaylistId,
+} = playerSlice.actions;
 export default playerSlice.reducer;

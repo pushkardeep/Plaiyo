@@ -1,20 +1,18 @@
 import React, {useEffect, useState} from 'react';
+import {useDispatch, useSelector} from 'react-redux';
+
 import {
-  StyleSheet,
   Text,
   View,
   Image,
+  StyleSheet,
   useColorScheme,
   TouchableOpacity,
 } from 'react-native';
-import LinearGradient from 'react-native-linear-gradient';
-import Slider from '@react-native-community/slider';
 
 import TopColor from '../components/common/TopColor';
 import MiddleColor from '../components/common/MiddleColor';
 import BottomColor from '../components/common/BottomColor';
-
-import {Icons, temt_2} from '../utils/constants.utils';
 
 import Animated, {
   useAnimatedStyle,
@@ -23,36 +21,45 @@ import Animated, {
   withTiming,
   runOnJS,
 } from 'react-native-reanimated';
-import {useDispatch, useSelector} from 'react-redux';
+
 import {
-  handlePlayback,
-  handleRepeat,
-  handleShuffle,
-} from '../utils/player.utils';
+  removeFromFavorites,
+  updateFavorites,
+} from '../redux/slices/favorite.slice';
+
 import {
   getDuration,
   stepBackward,
   stepForward,
   getCurrentTime,
 } from '../services/player/player.service';
+
 import {
-  removeFromFavorites,
-  updateFavorites,
-} from '../redux/slices/favorite.slice';
+  handlePlayback,
+  handleRepeat,
+  handleShuffle,
+} from '../utils/player.utils';
+
+import {Icons, temt_2} from '../utils/constants.utils';
+
+import LinearGradient from 'react-native-linear-gradient';
+import Slider from '@react-native-community/slider';
 import SoundPlayer from 'react-native-sound-player';
 
 const Player = ({setOpenState}) => {
   const dispatch = useDispatch();
   const isDarkMode = useColorScheme() === 'dark';
+
   const translateY = useSharedValue('100%');
 
-  const [isFavorite, setIsFavorite] = useState(false);
   const [duration, setDuration] = useState(0);
   const [currentTime, setCurrentTime] = useState(0);
+  const [isFavorite, setIsFavorite] = useState(false);
+  const [isImageExists, setIsImageExists] = useState(false);
 
   const {songs} = useSelector(state => state.songs);
-  const {isPlaying, isPaused} = useSelector(state => state.playing);
   const {favorites} = useSelector(state => state.favorites);
+  const {isPlaying, isPaused} = useSelector(state => state.playing);
   const {isRepeat, isShuffle, currentSong, queueSongs} = useSelector(
     state => state.player,
   );
@@ -61,6 +68,19 @@ const Player = ({setOpenState}) => {
     transform: [{translateY: translateY.value}],
   }));
 
+  const checkImageExists = async path => {
+    const {success, exists} = await checkExists(path);
+    if (success) {
+      if (exists) {
+        setIsImageExists(true);
+      } else {
+        setIsImageExists(false);
+      }
+    } else {
+      setIsImageExists(false);
+    }
+  };
+
   const onUnMount = () => {
     translateY.value = withTiming('100%', {}, isFinished => {
       if (isFinished) {
@@ -68,6 +88,11 @@ const Player = ({setOpenState}) => {
       }
     });
   };
+
+  useEffect(() => {
+    if (!currentSong?.coverImage) return setIsImageExists(false);
+    checkImageExists(currentSong?.coverImage);
+  }, [currentSong]);
 
   useEffect(() => {
     const cleanup = getCurrentTime(isPlaying, isPaused, setCurrentTime, 1000);
@@ -107,7 +132,7 @@ const Player = ({setOpenState}) => {
             style={styles.image}
             resizeMode="cover"
             source={
-              currentSong?.coverImage
+              isImageExists
                 ? {uri: `file://${currentSong?.coverImage}`}
                 : temt_2
             }

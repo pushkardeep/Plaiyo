@@ -75,6 +75,7 @@ const CreatePlaylist = ({navigation}) => {
     }
 
     const newPlaylist = {
+      id: `${Date.now()}`,
       name: playlistName,
       cover: playlistImage,
       songs: selectedSongs,

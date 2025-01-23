@@ -17,8 +17,11 @@ import {
 import {setCurrentSong, setSongQueue} from '../redux/slices/player.slice';
 import {setPause} from '../redux/slices/playing.slice';
 
-import {Icons} from '../utils/constants.utils';
+import {Icons, temt_2} from '../utils/constants.utils';
 import {playSong, stopPlayer} from '../services/player/player.service';
+import {setPlaylistReduxStates} from '../utils/redux.utils';
+
+import {checkExists} from '../services/rnfs/rnfs.service';
 
 // Menu button
 const SmallMenuButton = ({callback, isDarkMode}) => {
@@ -67,6 +70,8 @@ const SmallMenu = ({isPresent, callback, isDarkMode}) => {
 
 const SongCard = ({
   song,
+  isPlaylist = false,
+  playlistId = '',
   queueSongs,
   isDisable = false,
   isSmallMenu,
@@ -80,6 +85,7 @@ const SongCard = ({
   const [isPresent, setIsPresent] = useState(false);
   const [isSelected, setIsSelected] = useState(false);
   const [isOptionOpen, setIsOptionOpen] = useState(false);
+  const [isImageExists, setIsImageExists] = useState(false);
 
   const {favorites} = useSelector(state => state.favorites);
   const {currentSong} = useSelector(state => state.player);
@@ -92,6 +98,7 @@ const SongCard = ({
     // setting states for new song
     dispatch(setCurrentSong(song));
     dispatch(setSongQueue(queueSongs || []));
+    setPlaylistReduxStates(isPlaylist, playlistId, dispatch);
     playSong(song.songPath, dispatch, 0);
   };
 
@@ -124,6 +131,19 @@ const SongCard = ({
     setIsSelected(!isSelected); // Toggle the selection state
   };
 
+  const checkImageExists = async path => {
+    const {success, exists} = await checkExists(path);
+    if (success) {
+      if (exists) {
+        setIsImageExists(true);
+      } else {
+        setIsImageExists(false);
+      }
+    } else {
+      setIsImageExists(false);
+    }
+  };
+
   useEffect(() => {
     const isPresent = favorites.some(favorite => favorite.id === song.id);
     setIsPresent(isPresent);
@@ -135,6 +155,11 @@ const SongCard = ({
     }
   }, [selectedSongs]);
 
+  useEffect(() => {
+    if (!song?.coverImage) return setIsImageExists(false);
+    checkImageExists(song?.coverImage);
+  }, [song]);
+
   return (
     <View style={styles.container}>
       <TouchableOpacity
@@ -143,7 +168,7 @@ const SongCard = ({
         disabled={isDisable}>
         <Image
           resizeMode="cover"
-          source={{uri: `file://${song.coverImage}`}}
+          source={isImageExists ? {uri: `file://${song.coverImage}`} : temt_2}
           style={styles.image}
         />
 

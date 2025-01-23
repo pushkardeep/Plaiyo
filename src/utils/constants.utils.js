@@ -73,7 +73,7 @@ export const Icons = {
     repeat: (size, color) => (
       <Feather name="repeat" size={size} color={color} />
     ),
-    
+
     speaker: (size, color) => (
       <Feather name="speaker" size={size} color={color} />
     ),
@@ -107,6 +107,9 @@ export const Icons = {
   FontAwesome5: {
     play: (size, color) => (
       <FontAwesome5 name="play" size={size} color={color} />
+    ),
+    pause: (size, color) => (
+      <FontAwesome5 name="pause" size={size} color={color} />
     ),
   },
 };

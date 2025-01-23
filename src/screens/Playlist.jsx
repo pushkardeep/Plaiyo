@@ -1,50 +1,107 @@
 import React, {useEffect, useState} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
+
 import {
-  StyleSheet,
   Text,
   View,
   Image,
   ScrollView,
-  TouchableOpacity,
+  StyleSheet,
   useColorScheme,
+  TouchableOpacity,
 } from 'react-native';
-import LinearGradient from 'react-native-linear-gradient';
 
-import {Icons, temt_2} from '../utils/constants.utils';
-import BackButton from '../components/common/BackButton';
-
-import BottomColor from '../components/common/BottomColor';
-import Widget from '../components/common/Widget';
-import SongCard from '../components/SongCard';
 import Player from '../components/Player';
+import SongCard from '../components/SongCard';
+import Widget from '../components/common/Widget';
+import BackButton from '../components/common/BackButton';
+import BottomColor from '../components/common/BottomColor';
+
+import {setCurrentSong, setSongQueue} from '../redux/slices/player.slice';
+import {
+  pauseSong,
+  playSong,
+  resumeSong,
+} from '../services/player/player.service';
+
 import {handleShuffle} from '../utils/player.utils';
-import {setSongQueue} from '../redux/slices/player.slice';
-import {playSong} from '../services/player/player.service';
+import {Icons, temt_2} from '../utils/constants.utils';
+import {setPlaylistReduxStates} from '../utils/redux.utils';
+import {checkExists} from '../services/rnfs/rnfs.service';
+
+import LinearGradient from 'react-native-linear-gradient';
 
 const PlaylistScreen = ({route, navigation}) => {
   const dispatch = useDispatch();
   const isDarkMode = useColorScheme() === 'dark';
 
   const {playlists} = useSelector(state => state.playlist);
-  const {currentSong, isShuffle, isRepeat} = useSelector(state => state.player);
+  const {currentSong, isShuffle, isRepeat, playlistId} = useSelector(
+    state => state.player,
+  );
+  const {isPlaying, isPaused} = useSelector(state => state.playing);
 
   const [playlist, setPlaylist] = useState(null);
   const [isPlayerOpen, setIsPlayerOpen] = useState(false);
+  const [isImageExists, setIsImageExists] = useState(false);
+  const [isCurrentPlaylistPlaying, setIsCurrentPlaylistPlaying] =
+    useState(false);
 
   const {playlistIndex} = route.params;
 
+  const checkImageExists = async path => {
+    const {success, exists} = await checkExists(path);
+    if (success) {
+      if (exists) {
+        setIsImageExists(true);
+      } else {
+        setIsImageExists(false);
+      }
+    } else {
+      setIsImageExists(false);
+    }
+  };
+
+  const handlePlayback = () => {
+    if (isPlaying && isCurrentPlaylistPlaying) {
+      if (isPaused) {
+        resumeSong(dispatch);
+      } else {
+        pauseSong(dispatch);
+      }
+    } else {
+      playAll();
+    }
+  };
+
   const playAll = () => {
+    if (!playlist || !playlist.songs?.length) return;
+
     dispatch(setSongQueue(playlist?.songs));
     if (isShuffle) {
       const randomIndex = Math.floor(Math.random() * playlist?.songs?.length);
-      playSong(playlist?.songs[randomIndex]?.songPath);
+      setPlaylistReduxStates(true, playlist?.id, dispatch);
+      dispatch(setCurrentSong(playlist?.songs[randomIndex]));
+      playSong(playlist?.songs[randomIndex]?.songPath, dispatch);
+    } else {
+      setPlaylistReduxStates(true, playlist?.id, dispatch);
+      dispatch(setCurrentSong(playlist?.songs[0]));
+      playSong(playlist?.songs[0]?.songPath, dispatch);
     }
   };
 
   useEffect(() => {
+    if (!playlist?.cover) return setIsImageExists(false);
+    checkImageExists(playlist?.cover);
+  }, [playlist]);
+
+  useEffect(() => {
     setPlaylist(playlists[playlistIndex]);
   }, [playlistIndex]);
+
+  useEffect(() => {
+    setIsCurrentPlaylistPlaying(playlist?.id === playlistId);
+  }, [playlistId, playlist]);
 
   return (
     <View
@@ -69,7 +126,7 @@ const PlaylistScreen = ({route, navigation}) => {
               <View style={styles.coverImageContainer}>
                 <Image
                   source={
-                    playlist?.cover ? {uri: `file://${playlist.cover}`} : temt_2
+                    isImageExists ? {uri: `file://${playlist.cover}`} : temt_2
                   }
                   style={styles.coverImage}
                 />
@@ -99,13 +156,19 @@ const PlaylistScreen = ({route, navigation}) => {
               </View>
 
               <View style={styles.actionButtons}>
-                <TouchableOpacity style={styles.playButton} onPress={playAll}>
+                <TouchableOpacity
+                  style={styles.playButton}
+                  onPress={handlePlayback}>
                   <LinearGradient
                     colors={['#4527A0', '#6200EA']}
                     start={{x: 0, y: 0}}
                     end={{x: 1, y: 0}}
                     style={styles.playButtonGradient}>
-                    {Icons.FontAwesome5.play(13, 'white')}
+                    {isPlaying && isCurrentPlaylistPlaying
+                      ? isPaused
+                        ? Icons.FontAwesome5.play(13, 'white')
+                        : Icons.Ionicons.pause(20, 'white')
+                      : Icons.FontAwesome5.play(13, 'white')}
                     <Text style={styles.playButtonText}>Play All</Text>
                   </LinearGradient>
                 </TouchableOpacity>
@@ -141,6 +204,8 @@ const PlaylistScreen = ({route, navigation}) => {
                 <SongCard
                   key={index}
                   song={song}
+                  isPlaylist={true}
+                  playlistId={playlist?.id}
                   queueSongs={playlist?.songs}
                   isSmallMenu={true}
                 />

@@ -26,6 +26,7 @@ import Animated, {
   useAnimatedStyle,
   withSpring,
 } from 'react-native-reanimated';
+import {checkExists} from '../../services/rnfs/rnfs.service';
 
 const Widget = ({callback}) => {
   const dispatch = useDispatch();
@@ -42,6 +43,25 @@ const Widget = ({callback}) => {
   const [duration, setDuration] = useState(0);
   const [progress, setProgress] = useState(0);
   const [currentTime, setCurrentTime] = useState(0);
+  const [isImageExists, setIsImageExists] = useState(false);
+
+  const checkImageExists = async path => {
+    const {success, exists} = await checkExists(path);
+    if (success) {
+      if (exists) {
+        setIsImageExists(true);
+      } else {
+        setIsImageExists(false);
+      }
+    } else {
+      setIsImageExists(false);
+    }
+  };
+
+  useEffect(() => {
+    if (!currentSong?.coverImage) return setIsImageExists(temt_2);
+    checkImageExists(currentSong?.coverImage);
+  }, [currentSong]);
 
   useEffect(() => {
     const cleanup = getCurrentTime(isPlaying, isPaused, setCurrentTime, 1000);
@@ -103,9 +123,7 @@ const Widget = ({callback}) => {
         <TouchableOpacity style={styles.songInfo} onPress={callback}>
           <Image
             source={
-              currentSong?.coverImage
-                ? {uri: `file://${currentSong.coverImage}`}
-                : temt_2
+              isImageExists ? {uri: `file://${currentSong.coverImage}`} : temt_2
             }
             style={styles.albumArt}
           />

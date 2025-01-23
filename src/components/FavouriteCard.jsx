@@ -5,7 +5,13 @@ import {StyleSheet, Text, View, Image} from 'react-native';
 import BlurBgButton from './BlurBgButton';
 import {setCurrentSong} from '../redux/slices/player.slice';
 import {temt_2} from '../utils/constants.utils';
-import {pauseSong, playSong} from '../services/player/player.service';
+import {
+  pauseSong,
+  playSong,
+  resumeSong,
+} from '../services/player/player.service';
+import {checkExists} from '../services/rnfs/rnfs.service';
+import {setPlaylistReduxStates} from '../utils/redux.utils';
 
 const FavouriteCard = ({song}) => {
   const dispatch = useDispatch();
@@ -18,35 +24,46 @@ const FavouriteCard = ({song}) => {
   const {isPaused} = useSelector(state => state.playing);
 
   const setCurrent = () => {
-    dispatch(setCurrentSong(song));
-    if (isCurrentPlaying) {
+    if (isCurrentPlaying && isPlaying) {
       if (isPaused) {
         resumeSong(dispatch);
       } else {
         pauseSong(dispatch);
       }
     } else {
+      setPlaylistReduxStates(false, '', dispatch);
+      dispatch(setCurrentSong(song));
       playSong(song?.songPath, dispatch);
     }
   };
 
-  useEffect(() => {
-    if (song) {
-      setImageSource({
-        uri: `file://${song.coverImage}`,
-      });
+  const checkImageExists = async path => {
+    const {success, exists} = await checkExists(path);
+    if (success) {
+      if (exists) {
+        setImageSource({
+          uri: `file://${song.coverImage}`,
+        });
+      } else {
+        setImageSource(temt_2);
+      }
     } else {
       setImageSource(temt_2);
     }
+  };
+
+  useEffect(() => {
+    if (!song?.coverImage) return setImageSource(temt_2);
+    checkImageExists(song?.coverImage);
   }, [song]);
 
   useEffect(() => {
-    if (currentSong && isPlaying && !isPaused && song) {
+    if (currentSong && song) {
       setIsCurrentPlaying(currentSong.id === song.id ? true : false);
     } else {
       setIsCurrentPlaying(false);
     }
-  }, [currentSong, isPlaying, isPaused, song]);
+  }, [currentSong, song]);
 
   return (
     <View style={styles.container}>
@@ -65,7 +82,9 @@ const FavouriteCard = ({song}) => {
           song={song}
           img={imageSource}
           callback={setCurrent}
-          isPlaying={isCurrentPlaying}
+          isPlaying={
+            isPlaying && isCurrentPlaying ? (isPaused ? false : true) : false
+          }
         />
       )}
 

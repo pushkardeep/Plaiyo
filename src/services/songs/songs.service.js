@@ -3,7 +3,7 @@ import {extractMetaDataFromAudio} from '../ffmpeg/extractMetaDataFromAudio.servi
 import {cacheMetaImages} from '../rnfs/cacheMetaImages.service';
 
 import {setSongs, removeSongs} from '../../redux/slices/songs.slice';
-import {deleteFile} from '../rnfs/delete.service';
+import {deleteFile} from '../rnfs/rnfs.service';
 import {removeDeletedFavouriteSongs} from '../../redux/slices/favorite.slice';
 import {removeDeletedPlaylistSongs} from '../../redux/slices/playlist.slice';
 
