@@ -4,7 +4,7 @@
 export const headphone_dark = require('../assets/images/headphone-dark.png');
 export const headphone_light = require('../assets/images/headphone-light.png');
 export const temt_1 = require('../assets/images/temp_1.png');
-export const temt_2 = require('../assets/images/temp_2.jpg');
+export const temt_2 = require('../assets/images/temp_2.png');
 export const menu = require('../assets/images/menu.png');
 
 // React Native Vector Icons constants
@@ -85,6 +85,10 @@ export const Icons = {
     ),
     imgAdd: (size, color) => (
       <MaterialIcons name="add-photo-alternate" size={size} color={color} />
+    ),
+
+    plus: (size, color) => (
+      <MaterialIcons name="add" size={size} color={color} />
     ),
   },
 

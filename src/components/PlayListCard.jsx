@@ -47,15 +47,15 @@ const PlayListCard = ({playlist, callback, additionalStyles}) => {
         <Image
           resizeMode="cover"
           source={isImageExists ? {uri: `file://${playlist.cover}`} : temt_1}
-          style={[styles.playlistImg, {zIndex: 1, opacity: playlist ? 1 : 0.4}]}
+          style={[styles.playlistImg, {zIndex: 1}]}
         />
-        {playlist && (
-          <Image
-            resizeMode="cover"
-            source={isImageExists ? {uri: `file://${playlist.cover}`} : temt_1}
-            style={[styles.playlistImgShadow]}
-          />
-        )}
+
+        <Image
+          resizeMode="cover"
+          source={isImageExists ? {uri: `file://${playlist.cover}`} : temt_1}
+          style={[styles.playlistImgShadow]}
+        />
+
         {playlist && (
           <View style={styles.playlistInfoContainer}>
             <Text style={styles.playlistTitle}>{playlist?.name}</Text>
@@ -128,13 +128,13 @@ const styles = StyleSheet.create({
   playlistCreateTextContainer: {
     flex: 1,
     flexDirection: 'column',
-    alignItems: 'center',
+    alignItems: 'start',
     justifyContent: 'center',
     zIndex: 1,
     position: 'absolute',
     top: '50%',
-    left: '50%',
-    transform: 'translate(-50%, -50%)',
+    left: '20%',
+    transform: 'translate(-20%, -50%)',
   },
 
   playlistIndicatorText: {

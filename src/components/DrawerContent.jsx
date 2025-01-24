@@ -15,6 +15,7 @@ import MaterialIcons from 'react-native-vector-icons/dist/MaterialIcons';
 
 import TopColor from './common/TopColor';
 import BottomColor from './common/BottomColor';
+import { Icons } from '../utils/constants.utils';
 
 const DrawerContent = ({navigation}) => {
   const isDarkMode = useColorScheme() === 'dark';
@@ -30,20 +31,23 @@ const DrawerContent = ({navigation}) => {
       />
 
       <View style={styles.menuOptionsContainer}>
-        <TouchableOpacity style={styles.menuOption}>
+        <TouchableOpacity
+          onPress={() => navigation.navigate('CreatePlaylist')}
+          style={styles.menuOption}>
           <View style={{flexDirection: 'row', alignItems: 'center', gap: 6}}>
-            <MaterialCommunityIcons
+            {Icons.MaterialIcons.plus(25, isDarkMode ? 'white' : 'black')}
+            {/* <MaterialCommunityIcons
               style={{opacity: 0.6}}
-              name="playlist-music"
+              name="playlist-plus"
               size={25}
               color={isDarkMode ? 'white' : 'black'}
-            />
+            /> */}
             <Text
               style={[
                 styles.menuText,
                 {color: isDarkMode ? 'white' : 'black'},
               ]}>
-              Playlist
+              New Playlist
             </Text>
           </View>
           <MaterialIcons
@@ -94,32 +98,6 @@ const DrawerContent = ({navigation}) => {
                 {color: isDarkMode ? 'white' : 'black'},
               ]}>
               Connect
-            </Text>
-          </View>
-          <MaterialIcons
-            style={{opacity: 0.6}}
-            name="keyboard-arrow-right"
-            size={20}
-            color={isDarkMode ? 'white' : 'black'}
-          />
-        </TouchableOpacity>
-        <Divider dividerStyles={{marginVertical: 10}} />
-        <TouchableOpacity
-          onPress={() => navigation.navigate('CreatePlaylist')}
-          style={styles.menuOption}>
-          <View style={{flexDirection: 'row', alignItems: 'center', gap: 6}}>
-            <MaterialCommunityIcons
-              style={{opacity: 0.6}}
-              name="playlist-plus"
-              size={25}
-              color={isDarkMode ? 'white' : 'black'}
-            />
-            <Text
-              style={[
-                styles.menuText,
-                {color: isDarkMode ? 'white' : 'black'},
-              ]}>
-              Create Playlist
             </Text>
           </View>
           <MaterialIcons

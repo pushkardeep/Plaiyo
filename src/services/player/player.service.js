@@ -2,14 +2,17 @@ import {setCurrentSong} from '../../redux/slices/player.slice';
 import {setPause, setPlaying} from '../../redux/slices/playing.slice';
 
 import SoundPlayer from 'react-native-sound-player';
+import {checkExists} from '../rnfs/rnfs.service';
 
 export const playSong = async (songPath, dispatch) => {
   try {
-    SoundPlayer.playUrl(`file://${songPath}`);
-    dispatch(setPlaying(true));
+    const {success, exists} = await checkExists(songPath);
+    if (success && exists) {
+      SoundPlayer.playUrl(`file://${songPath}`);
+      dispatch(setPlaying(true));
+    }
   } catch (error) {
     console.log('Error in playing song', error.message);
-    return {message: 'Something went wrong'};
   }
 };
 

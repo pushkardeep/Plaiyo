@@ -45,6 +45,7 @@ import {Icons, temt_2} from '../utils/constants.utils';
 import LinearGradient from 'react-native-linear-gradient';
 import Slider from '@react-native-community/slider';
 import SoundPlayer from 'react-native-sound-player';
+import {checkExists} from '../services/rnfs/rnfs.service';
 
 const Player = ({setOpenState}) => {
   const dispatch = useDispatch();
@@ -70,6 +71,7 @@ const Player = ({setOpenState}) => {
 
   const checkImageExists = async path => {
     const {success, exists} = await checkExists(path);
+    console.log(success);
     if (success) {
       if (exists) {
         setIsImageExists(true);
@@ -92,7 +94,7 @@ const Player = ({setOpenState}) => {
   useEffect(() => {
     if (!currentSong?.coverImage) return setIsImageExists(false);
     checkImageExists(currentSong?.coverImage);
-  }, [currentSong]);
+  }, [currentSong?.coverImage]);
 
   useEffect(() => {
     const cleanup = getCurrentTime(isPlaying, isPaused, setCurrentTime, 1000);
@@ -141,7 +143,7 @@ const Player = ({setOpenState}) => {
             style={styles.imageShadow}
             resizeMode="cover"
             source={
-              currentSong?.coverImage
+              isImageExists
                 ? {uri: `file://${currentSong?.coverImage}`}
                 : temt_2
             }

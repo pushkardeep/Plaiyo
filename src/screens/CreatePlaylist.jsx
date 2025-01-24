@@ -16,6 +16,7 @@ import {createPlaylists} from '../redux/slices/playlist.slice';
 import TopColor from '../components/common/TopColor';
 import MiddleColor from '../components/common/MiddleColor';
 import BottomColor from '../components/common/BottomColor';
+import NothingFound from '../components/common/NothingFound';
 
 import SongCard from '../components/SongCard';
 import BackButton from '../components/common/BackButton';
@@ -102,139 +103,145 @@ const CreatePlaylist = ({navigation}) => {
         styles.container,
         {backgroundColor: isDarkMode ? '#1D1B29' : '#FFFFFF'},
       ]}>
-      <View style={styles.contentContainer}>
-        {/* Header */}
-        <View style={styles.header}>
-          <BackButton callback={() => navigation.goBack()} />
-          <Text
-            style={[
-              styles.headerTitle,
-              {color: isDarkMode ? '#FFFFFF' : '#191724'},
-            ]}>
-            Create Playlist
-          </Text>
-          <View style={{width: 24}}>
-            <Text>{/* Empty text for alignment */}</Text>
-          </View>
-        </View>
-
-        <ScrollView style={styles.content}>
-          {/* Image Upload Section */}
-          <TouchableOpacity
-            onPress={handlePickImage}
-            style={[
-              styles.imageUploadContainer,
-              {
-                backgroundColor: isDarkMode ? '#2A2838' : '#F5F5F5',
-                borderColor: isDarkMode ? '#7B57E4' : '#4527A0',
-                borderWidth: playlistImage ? 0 : 1,
-              },
-            ]}>
-            {playlistImage ? (
-              <View style={styles.imgContainer}>
-                <Image
-                  source={{uri: playlistImage}}
-                  style={styles.uploadedImage}
-                />
-                <Image
-                  source={{uri: playlistImage}}
-                  style={styles.uploadedImgShadow}
-                />
-              </View>
-            ) : (
-              <View style={styles.uploadPlaceholder}>
-                {Icons.MaterialIcons.imgAdd(
-                  40,
-                  isDarkMode ? '#7B57E4' : '#4527A0',
-                )}
-                <Text
-                  style={[
-                    styles.uploadText,
-                    {color: isDarkMode ? '#FFFFFF' : '#191724'},
-                  ]}>
-                  Choose Playlist Cover
-                </Text>
-              </View>
-            )}
-          </TouchableOpacity>
-
-          {/* Title Input */}
-          <View style={styles.inputSection}>
+      {songs?.length > 0 ? (
+        <View style={styles.contentContainer}>
+          {/* Header */}
+          <View style={styles.header}>
+            <BackButton callback={() => navigation.goBack()} />
             <Text
               style={[
-                styles.inputLabel,
+                styles.headerTitle,
                 {color: isDarkMode ? '#FFFFFF' : '#191724'},
               ]}>
-              Playlist Name
+              Create Playlist
             </Text>
-            <TextInput
-              value={playlistName}
-              onChangeText={text => setPlaylistName(text)}
+            <View style={{width: 24}}>
+              <Text>{/* Empty text for alignment */}</Text>
+            </View>
+          </View>
+
+          <ScrollView style={styles.content}>
+            {/* Image Upload Section */}
+            <TouchableOpacity
+              onPress={handlePickImage}
               style={[
-                styles.input,
+                styles.imageUploadContainer,
                 {
                   backgroundColor: isDarkMode ? '#2A2838' : '#F5F5F5',
-                  color: isDarkMode ? '#FFFFFF' : '#191724',
                   borderColor: isDarkMode ? '#7B57E4' : '#4527A0',
+                  borderWidth: playlistImage ? 0 : 1,
                 },
-              ]}
-              placeholder="Enter playlist name"
-              placeholderTextColor={isDarkMode ? '#666666' : '#999999'}
-            />
-          </View>
-
-          <View style={styles.songsHeaderContainer}>
-            <Text
-              style={[
-                styles.songsHeading,
-                {color: isDarkMode ? '#FFFFFF' : 'black'},
               ]}>
-              Songs
-            </Text>
+              {playlistImage ? (
+                <View style={styles.imgContainer}>
+                  <Image
+                    source={{uri: playlistImage}}
+                    style={styles.uploadedImage}
+                  />
+                  <Image
+                    source={{uri: playlistImage}}
+                    style={styles.uploadedImgShadow}
+                  />
+                </View>
+              ) : (
+                <View style={styles.uploadPlaceholder}>
+                  {Icons.MaterialIcons.imgAdd(
+                    40,
+                    isDarkMode ? '#7B57E4' : '#4527A0',
+                  )}
+                  <Text
+                    style={[
+                      styles.uploadText,
+                      {color: isDarkMode ? '#FFFFFF' : '#191724'},
+                    ]}>
+                    Choose Playlist Cover
+                  </Text>
+                </View>
+              )}
+            </TouchableOpacity>
 
-            <TouchableOpacity
-              onPress={isAllSelected ? unselectAllSongs : selectAllSongs}>
+            {/* Title Input */}
+            <View style={styles.inputSection}>
               <Text
                 style={[
-                  styles.selectAllText,
-                  {color: isDarkMode ? '#7B57E4' : '#4527A0'},
+                  styles.inputLabel,
+                  {color: isDarkMode ? '#FFFFFF' : '#191724'},
                 ]}>
-                {isAllSelected ? 'Unselect All' : 'Select All'}
+                Playlist Name
               </Text>
+              <TextInput
+                value={playlistName}
+                onChangeText={text => setPlaylistName(text)}
+                style={[
+                  styles.input,
+                  {
+                    backgroundColor: isDarkMode ? '#2A2838' : '#F5F5F5',
+                    color: isDarkMode ? '#FFFFFF' : '#191724',
+                    borderColor: isDarkMode ? '#7B57E4' : '#4527A0',
+                  },
+                ]}
+                placeholder="Enter playlist name"
+                placeholderTextColor={isDarkMode ? '#666666' : '#999999'}
+              />
+            </View>
+
+            <View style={styles.songsHeaderContainer}>
+              <Text
+                style={[
+                  styles.songsHeading,
+                  {color: isDarkMode ? '#FFFFFF' : 'black'},
+                ]}>
+                Songs
+              </Text>
+
+              <TouchableOpacity
+                onPress={isAllSelected ? unselectAllSongs : selectAllSongs}>
+                <Text
+                  style={[
+                    styles.selectAllText,
+                    {color: isDarkMode ? '#7B57E4' : '#4527A0'},
+                  ]}>
+                  {isAllSelected ? 'Unselect All' : 'Select All'}
+                </Text>
+              </TouchableOpacity>
+            </View>
+
+            {/* Songs List */}
+            <View style={styles.songsContainer}>
+              {songs?.map((song, index) => (
+                <SongCard
+                  key={index}
+                  song={song}
+                  isDisable={true}
+                  isRadioButton={true}
+                  selectedSongs={selectedSongs}
+                  setSelectedSongs={setSelectedSongs}
+                />
+              ))}
+            </View>
+          </ScrollView>
+
+          {/* Bottom Button */}
+          <View style={styles.bottomContainer}>
+            <TouchableOpacity
+              disabled={!isFormValid}
+              onPress={handleSubmit}
+              style={[
+                styles.createButton,
+                {
+                  backgroundColor: isDarkMode ? '#7B57E4' : '#4527A0',
+                  opacity: !isFormValid ? 0.5 : 1,
+                },
+              ]}>
+              <Text style={styles.createButtonText}>Create Playlist</Text>
             </TouchableOpacity>
           </View>
-
-          {/* Songs List */}
-          <View style={styles.songsContainer}>
-            {songs.map((song, index) => (
-              <SongCard
-                key={index}
-                song={song}
-                isDisable={true}
-                isRadioButton={true}
-                selectedSongs={selectedSongs}
-                setSelectedSongs={setSelectedSongs}
-              />
-            ))}
-          </View>
-        </ScrollView>
-
-        {/* Bottom Button */}
-        <View style={styles.bottomContainer}>
-          <TouchableOpacity
-            disabled={!isFormValid}
-            onPress={handleSubmit}
-            style={[
-              styles.createButton,
-              {
-                backgroundColor: isDarkMode ? '#7B57E4' : '#4527A0',
-                opacity: !isFormValid ? 0.5 : 1,
-              },
-            ]}>
-            <Text style={styles.createButtonText}>Create Playlist</Text>
-          </TouchableOpacity>
         </View>
-      </View>
+      ) : (
+        <View style={styles.contentContainer}>
+          <NothingFound title={'No songs found'} />
+        </View>
+      )}
 
       <TopColor
         additionalStyles={{left: '0%', transform: 'translate(-0%, -0%)'}}

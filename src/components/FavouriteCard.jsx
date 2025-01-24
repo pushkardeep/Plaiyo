@@ -1,17 +1,20 @@
 import React, {useEffect, useState} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
-import {StyleSheet, Text, View, Image} from 'react-native';
 
+import {StyleSheet, Text, View, Image} from 'react-native';
 import BlurBgButton from './BlurBgButton';
-import {setCurrentSong} from '../redux/slices/player.slice';
-import {temt_2} from '../utils/constants.utils';
+
+import {setCurrentSong, setSongQueue} from '../redux/slices/player.slice';
 import {
   pauseSong,
   playSong,
   resumeSong,
 } from '../services/player/player.service';
-import {checkExists} from '../services/rnfs/rnfs.service';
 import {setPlaylistReduxStates} from '../utils/redux.utils';
+import {checkExists} from '../services/rnfs/rnfs.service';
+
+import {temt_2} from '../utils/constants.utils';
+import {setPause} from '../redux/slices/playing.slice';
 
 const FavouriteCard = ({song}) => {
   const dispatch = useDispatch();
@@ -22,6 +25,7 @@ const FavouriteCard = ({song}) => {
   const {isPlaying} = useSelector(state => state.playing);
   const {currentSong} = useSelector(state => state.player);
   const {isPaused} = useSelector(state => state.playing);
+    const {favorites} = useSelector(state => state.favorites);
 
   const setCurrent = () => {
     if (isCurrentPlaying && isPlaying) {
@@ -32,6 +36,8 @@ const FavouriteCard = ({song}) => {
       }
     } else {
       setPlaylistReduxStates(false, '', dispatch);
+      dispatch(setPause(false));
+      dispatch(setSongQueue(favorites));
       dispatch(setCurrentSong(song));
       playSong(song?.songPath, dispatch);
     }
@@ -63,17 +69,13 @@ const FavouriteCard = ({song}) => {
     } else {
       setIsCurrentPlaying(false);
     }
-  }, [currentSong, song]);
+  }, [currentSong, song, isPlaying]);
 
   return (
     <View style={styles.container}>
+      <Image resizeMode="cover" source={imageSource} style={[styles.image]} />
       <Image
-        resizeMode="cover"
-        source={imageSource}
-        style={[styles.image, {opacity: song ? 1 : 0.4}]}
-      />
-      <Image
-        style={[styles.imgShadow, {display: song ? '' : 'none'}]}
+        style={[styles.imgShadow]}
         resizeMode="cover"
         source={imageSource}
       />
@@ -128,9 +130,10 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     zIndex: 1,
     position: 'absolute',
-    top: '50%',
+    top: '90%',
     left: '50%',
-    transform: 'translate(-50%, -50%)',
+    fontWeight: 'bold',
+    transform: 'translate(-50%, -90%)',
     fontSize: 10,
     color: 'white',
     opacity: 0.7,

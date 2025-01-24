@@ -80,9 +80,6 @@ To learn more about React Native, take a look at the following resources:
 
 
 
+organize the data 
+fixing song playing bugs 
 
-make the playlist screen functional 
-demo images 
-toasts 
-some error handling of playing songs 
-putting demo mages with isfile exist if
