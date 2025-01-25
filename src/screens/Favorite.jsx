@@ -11,11 +11,13 @@ import HeaderContainer from '../components/common/HeaderContainer';
 import NothingFound from '../components/common/NothingFound';
 import Widget from '../components/common/Widget';
 import Player from '../components/Player';
+import SmallMenu from '../components/SmallMenu';
 
 const Favorite = ({navigation}) => {
   const isDarkMode = useColorScheme() === 'dark';
   const {favorites} = useSelector(state => state.favorites);
   const {currentSong} = useSelector(state => state.player);
+  const {isSmallMenuOpen, smallMenuTarget} = useSelector(state => state.ui);
 
   const [isPlayerOpen, setIsPlayerOpen] = useState(false);
   return (
@@ -67,6 +69,7 @@ const Favorite = ({navigation}) => {
       </View>
 
       {currentSong && <Widget callback={() => setIsPlayerOpen(true)} />}
+      {isSmallMenuOpen && smallMenuTarget && <SmallMenu />}
       {isPlayerOpen && <Player setOpenState={setIsPlayerOpen} />}
 
       <TopColor />

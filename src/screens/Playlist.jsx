@@ -40,6 +40,7 @@ const PlaylistScreen = ({route, navigation}) => {
     state => state.player,
   );
   const {isPlaying, isPaused} = useSelector(state => state.playing);
+  const {isSmallMenuOpen, smallMenuTarget} = useSelector(state => state.ui);
 
   const [playlist, setPlaylist] = useState(null);
   const [isPlayerOpen, setIsPlayerOpen] = useState(false);
@@ -215,6 +216,7 @@ const PlaylistScreen = ({route, navigation}) => {
       </ScrollView>
 
       {currentSong && <Widget callback={() => setIsPlayerOpen(true)} />}
+      {isSmallMenuOpen && smallMenuTarget && <SmallMenu />}
       {isPlayerOpen && <Player setOpenState={setIsPlayerOpen} />}
 
       <BottomColor

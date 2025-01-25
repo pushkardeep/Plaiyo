@@ -7,6 +7,7 @@ import playlistsSlice from '../slices/playlist.slice';
 import favoritesSlice from '../slices/favorite.slice';
 import playerSlice from '../slices/player.slice';
 import playingSlice from '../slices/playing.slice';
+import uiSlice from "../slices/ui.slice";
 
 // rootReducer
 const rootReducer = combineReducers({
@@ -16,6 +17,7 @@ const rootReducer = combineReducers({
   favorites: favoritesSlice,
   player: playerSlice,
   playing: playingSlice,
+  ui: uiSlice,
 });
 
 export default rootReducer;

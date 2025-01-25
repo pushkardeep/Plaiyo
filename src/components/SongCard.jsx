@@ -10,10 +10,6 @@ import {
   TouchableOpacity,
 } from 'react-native';
 
-import {
-  updateFavorites,
-  removeFromFavorites,
-} from '../redux/slices/favorite.slice';
 import {setCurrentSong, setSongQueue} from '../redux/slices/player.slice';
 import {setPause} from '../redux/slices/playing.slice';
 
@@ -22,51 +18,7 @@ import {playSong, stopPlayer} from '../services/player/player.service';
 import {setPlaylistReduxStates} from '../utils/redux.utils';
 
 import {checkExists} from '../services/rnfs/rnfs.service';
-
-// Menu button
-const SmallMenuButton = ({callback, isDarkMode}) => {
-  return (
-    <TouchableOpacity onPress={callback}>
-      {Icons.Entypo.threeDots(18, isDarkMode ? '#7B57E4' : '#4527A0')}
-    </TouchableOpacity>
-  );
-};
-
-// Menu
-const SmallMenu = ({isPresent, callback, isDarkMode}) => {
-  return (
-    <View
-      style={[
-        styles.smallMenu,
-        {
-          backgroundColor: isDarkMode ? '#191724' : '#FFFFFF',
-          borderWidth: 1,
-          borderColor: isDarkMode ? '#2A2838' : '#E5E5E5',
-        },
-      ]}>
-      <Text
-        style={[
-          styles.smallMenuText,
-          {color: isDarkMode ? '#7B57E4' : '#4527A0'},
-        ]}>
-        Options
-      </Text>
-      <TouchableOpacity onPress={callback} style={styles.menuOption}>
-        <Text
-          style={[
-            styles.smallMenuOptionText,
-            {color: isDarkMode ? '#FFFFFF' : '#191724'},
-          ]}>
-          {isPresent ? 'Remove' : 'Favourites'}
-        </Text>
-
-        {isPresent
-          ? Icons.AntDesign.heartFilled(18, '#FF5858')
-          : Icons.AntDesign.heart(18, isDarkMode ? 'white' : 'black')}
-      </TouchableOpacity>
-    </View>
-  );
-};
+import {setIsSmallMenuOpen, setSmallMenuTarget} from '../redux/slices/ui.slice';
 
 const SongCard = ({
   song,
@@ -82,12 +34,9 @@ const SongCard = ({
   const dispatch = useDispatch();
   const isDarkMode = useColorScheme() === 'dark';
 
-  const [isPresent, setIsPresent] = useState(false);
   const [isSelected, setIsSelected] = useState(false);
-  const [isOptionOpen, setIsOptionOpen] = useState(false);
   const [isImageExists, setIsImageExists] = useState(false);
 
-  const {favorites} = useSelector(state => state.favorites);
   const {currentSong} = useSelector(state => state.player);
 
   const setCurrent = () => {
@@ -102,10 +51,6 @@ const SongCard = ({
     playSong(song.songPath, dispatch, 0);
   };
 
-  const toggleMenu = () => {
-    setIsOptionOpen(!isOptionOpen);
-  };
-
   const addToList = () => {
     setSelectedSongs(prevSelected => [...prevSelected, song]);
   };
@@ -114,12 +59,6 @@ const SongCard = ({
     setSelectedSongs(prevSelected =>
       prevSelected.filter(item => item.id !== song.id),
     );
-  };
-
-  const updateFavoriteList = () => {
-    isPresent
-      ? dispatch(removeFromFavorites(song))
-      : dispatch(updateFavorites([song]));
   };
 
   const onRadioPress = () => {
@@ -143,11 +82,6 @@ const SongCard = ({
       setIsImageExists(false);
     }
   };
-
-  useEffect(() => {
-    const isPresent = favorites.some(favorite => favorite.id === song.id);
-    setIsPresent(isPresent);
-  }, [favorites]);
 
   useEffect(() => {
     if (selectedSongs) {
@@ -192,7 +126,13 @@ const SongCard = ({
           Icons.Feather.speaker(18, isDarkMode ? '#7B57E4' : '#4527A0')}
 
         {isSmallMenu && (
-          <SmallMenuButton callback={toggleMenu} isDarkMode={isDarkMode} />
+          <TouchableOpacity
+            onPress={() => {
+              dispatch(setIsSmallMenuOpen(true));
+              dispatch(setSmallMenuTarget(song));
+            }}>
+            {Icons.Entypo.threeDots(18, isDarkMode ? '#7B57E4' : '#4527A0')}
+          </TouchableOpacity>
         )}
 
         {isRadioButton && (
@@ -217,14 +157,6 @@ const SongCard = ({
           </TouchableOpacity>
         )}
       </TouchableOpacity>
-
-      {isOptionOpen && (
-        <SmallMenu
-          isPresent={isPresent}
-          callback={updateFavoriteList}
-          isDarkMode={isDarkMode}
-        />
-      )}
     </View>
   );
 };
@@ -268,49 +200,6 @@ const styles = StyleSheet.create({
     fontSize: 10,
     opacity: 0.7,
     fontWeight: 'normal',
-  },
-
-  smallMenu: {
-    position: 'absolute',
-    top: 40,
-    right: 20,
-    zIndex: 1,
-    minWidth: 180,
-    borderRadius: 12,
-    paddingVertical: 8,
-    paddingHorizontal: 12,
-    elevation: 5,
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.15,
-    shadowRadius: 3.84,
-  },
-
-  smallMenuText: {
-    fontFamily: 'Inter',
-    fontSize: 12,
-    fontWeight: '600',
-    paddingVertical: 4,
-    paddingHorizontal: 8,
-    borderBottomWidth: 1,
-    borderBottomColor: 'rgba(123, 87, 228, 0.1)',
-  },
-
-  menuOption: {
-    paddingVertical: 8,
-    paddingHorizontal: 8,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-  },
-
-  smallMenuOptionText: {
-    fontFamily: 'Inter',
-    fontSize: 14,
-    fontWeight: '500',
   },
 
   checkbox: {

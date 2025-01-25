@@ -1,11 +1,5 @@
 import React, {useState, useEffect} from 'react';
-import {
-  StyleSheet,
-  View,
-  FlatList,
-  useColorScheme,
-  StatusBar,
-} from 'react-native';
+import {StyleSheet, View, FlatList, useColorScheme} from 'react-native';
 
 import {useSelector, useDispatch} from 'react-redux';
 
@@ -28,6 +22,7 @@ import NothingFound from '../components/common/NothingFound';
 import PaginationDots from '../components/PaginationDots';
 import Widget from '../components/common/Widget';
 import Player from '../components/Player';
+import SmallMenu from '../components/SmallMenu';
 
 const Feed = ({navigation}) => {
   const dispatch = useDispatch();
@@ -36,6 +31,7 @@ const Feed = ({navigation}) => {
 
   const [activeIndex, setActiveIndex] = useState(0);
   const {songs} = useSelector(state => state.songs);
+  const {isSmallMenuOpen, smallMenuTarget} = useSelector(state => state.ui);
   const {audioReadPermission} = useSelector(state => state.permission);
   const {currentSong} = useSelector(state => state.player);
   const {playlists} = useSelector(state => state.playlist);
@@ -175,6 +171,7 @@ const Feed = ({navigation}) => {
         )}
       </View>
       {currentSong && <Widget callback={() => setIsPlayerOpen(true)} />}
+      {isSmallMenuOpen && smallMenuTarget && <SmallMenu />}
       {isPlayerOpen && <Player setOpenState={setIsPlayerOpen} />}
       <TopColor
         additionalStyles={{left: '0%', transform: 'translate(-0%, -0%)'}}
