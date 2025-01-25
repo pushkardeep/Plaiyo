@@ -1,5 +1,11 @@
 import React, {useState, useEffect} from 'react';
-import {StyleSheet, View, FlatList, useColorScheme} from 'react-native';
+import {
+  StyleSheet,
+  View,
+  FlatList,
+  useColorScheme,
+  StatusBar,
+} from 'react-native';
 
 import {useSelector, useDispatch} from 'react-redux';
 
