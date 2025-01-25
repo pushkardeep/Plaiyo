@@ -30,6 +30,7 @@ import {setPlaylistReduxStates} from '../utils/redux.utils';
 import {checkExists} from '../services/rnfs/rnfs.service';
 
 import LinearGradient from 'react-native-linear-gradient';
+import SmallMenu from '../components/SmallMenu';
 
 const PlaylistScreen = ({route, navigation}) => {
   const dispatch = useDispatch();
